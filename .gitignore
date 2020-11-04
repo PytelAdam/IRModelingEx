@@ -46,3 +46,6 @@ vignettes/*.pdf
 *.log
 *.gz
 *.pdf
+
+# HTML Slides
+slides/*.html
