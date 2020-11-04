@@ -1,0 +1,330 @@
+---
+title: "Analiza szeregów czasowych\n stóp procentowych"
+author: "Adam Pytel"
+date: "31 paŸdziernika 2020"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(ggplot2)
+```
+
+## Wstêp cz.1
+
+Wiêkszoœæ modeli (poza modelami teoretycznymi) powinna byæ budowana w oparciu
+o dane, a tak¿e z nimi konfrontowana. Na dzisiejszych zajêciach spróbujemy
+przyjrzeæ siê nieco bli¿ej obserwowanym danym, by w przysz³oœci móc krytycznie
+podchodziæ do modeli i ich ograniczeñ.
+
+Zajêcia przeprowadzone bêd¹ w nastêpuj¹cym kluczu:
+
+1. Przenalizujemy szeregi czasowe stóp referencyjnych i spróbujemy zidentyfikowaæ
+istotne problemy w modelowaniu ich dynamiki.
+2. Przeanalizujemy dynamikê krzywych terminowych.
+3. Przyjrzymy siê modelom chwilowej stopy procentowej.
+
+## Wstêp cz.2
+
+Na pierwszych zajêciach omawialiœmy wp³yw stóp procentowych na rynek pieniê¿ny
+i rynek kapit³owy. Drugie zajêcia skupi³y siê bardziej na zagadnieniu zamiany miary
+pomocnym w wycenie instrumentów finansowych. Dziœ skupimy siê na aspektach modelowania przy mierze rzeczywistej. 
+
+Nie bêd¹ to zajêcia poœwiêcone modelom ekonometrycznym czy zagadnieniom
+mikrostruktury rynku, bo celem tego
+przedmiotu nie jest prognozowanie stóp procentowych. Dotkniemy jednak
+pewnych aspektów, które maj¹ prze³o¿enie na modele wyceny.
+
+## Analiza danych {.smaller}
+
+Rozpoczniemy od przeanalizowania szeregu czasowego Effective Fed Funds Rate (EFFR)
+przedstawionego na poni¿szym wykresie.
+
+```{r fed_ts, fig.align='center', fig.height=4}
+EFFR <- readr::read_csv(file = "../data/EFFR.csv", 
+                        col_types = readr::cols(
+                          DATE = readr::col_date(format = "%Y-%m-%d"), 
+                          EFFR = readr::col_double()), 
+                        na = ".")
+EFFR <- zoo::zoo(x = EFFR$EFFR, order.by = EFFR$DATE)
+EFFR <- zoo::na.fill(EFFR, fill="extend")
+zoo::autoplot.zoo(EFFR) %+% 
+  geom_line(color="orange", size=1.2) %+% labs(x=NULL, y="EFFR (%)") %+%
+  theme_bw()
+```
+
+## Efekty koñca miesi¹ca i koñca roku {.smaller}
+
+Banki centralne maj¹ za zadanie czuwaæ nad stabilnoœci¹ stóp procentowy. EFFR, 
+jako jedna z podstawowych stóp, jest efektywnie zarz¹dzana przez Rezerwê Federaln¹.
+Wiêkszoœæ obserwowanych skoków jest efektem œwiadomych decyzji FOMC. 
+Jednak¿e na wykresie widoczne s¹ dwa efekty
+nie zwi¹zane bezpoœrednio z ustalaniem celu krótkoterminowych stóp.
+
+```{r diff-effr1, fig.align='center', fig.height=3.5}
+dEFFR <- diff(EFFR)
+zoo::autoplot.zoo(window(dEFFR,start = "2017-07-01", end = '2017-10-31')) %+% 
+  geom_line(color="orange", size=1.2) %+% labs(x=NULL, y="Diff. EFFR (%)") %+%
+  theme_bw()
+```
+
+<div class="notes">
+Widoczny efekt spadków na koniec miesi¹ca i koniec roku zwi¹zany jest z regulacj¹
+p³ynnoœciow¹ w ramach Basel III, a mianowicie z utrzymywaniem bardzo p³ynnych
+instrumentów finansowych na ksi¹¿kach bankowych. Filie zagraniczne objête innymi
+regulacjami mia³y obliczaæ LCR (Liquidity Coverage Ratio) na koniec miesi¹ca
+i kwarta³ów w przeciwieñstwie do banków amerykañskich.
+</div>
+
+## Zmiany polityki pieniê¿nej {.smaller}
+
+Drugi zauwa¿alny efekt to zmiana re¿imu w 2018 roku. Jest on spowodowany zmianami
+polityki pienie¿nej i normalizowaniem sytuacji na rynku (powrót do polityki monetarnej sprzed kryzysu).
+
+
+```{r diff-effr2, fig.align='center', fig.height=3.5}
+zoo::autoplot.zoo(dEFFR) %+% 
+  geom_line(color="orange", size=1) %+% labs(x=NULL, y="Diff. EFFR (%)") %+%
+  theme_bw()
+```
+
+## Podatek korporacyjny i regulacje {.smaller}
+
+Drug¹ wa¿n¹ stawk¹ jest SOFR (ang. *Secured Overnight Financing Rate*), która
+jest œredni¹ wa¿on¹ stóp w transakcjach GC repo (*general collateral repo*).
+W niej równie¿ widaæ efekty miesiêczne zwi¹zane z podatekim korporacyjnym w Stanach
+Zjednoczonych jak i dwie anomalie (pod koniec roku 2018 oraz 16-18 wrzeœnia 2019 r).
+
+
+```{r soft_ts, fig.align='center', fig.height=3.5}
+SOFR <- readr::read_csv("../data/SOFR.csv",
+                        col_types = readr::cols(
+                          DATE = readr::col_date(format = "%Y-%m-%d"),
+                          SOFR = readr::col_double()),
+                        na = ".")
+SOFR <- zoo::zoo(x = SOFR$SOFR, order.by = SOFR$DATE)
+zoo::autoplot.zoo(cbind(EFFR,SOFR,all=FALSE),facets = NULL) %+% 
+  labs(x=NULL,y="Rate (in %)", color="Rate type") %+% theme_bw()
+```
+
+<div class="notes">
+Anomalie zwi¹zane s¹ znów z regulacj¹ bazylejsk¹, narzucaj¹c¹ rezerwy p³ynnoœciowe.
+Wielcy dealerzy z rynku repo tacy jak JP Morgan trzymaj¹c wiêksze rezerwy na poczet wymogów nie byli w stanie dostarczyæ œrodków na rynku repo. SpóŸniona interwencja
+FOMC spowodowa³a wystrzelenie stawek repo.
+</div>
+
+## Wnioski z analizy cz. 1
+
+W rzeczywistoœci budowane modele pos³u¿¹ jedynie przez krótki moment. 
+Przeszkody na jakie natrafi nasz model, to miêdzy innymi:
+
+* zmiany w regulacjach,
+* zmiany w polityce pieniê¿nej i podatkowej,
+* wprowadzenie nowych instrumentów i "przesuniêcie" p³ynnoœci (patrz WIBOR)
+
+**Zadanie dodatkowe** Opracowaæ modele ewolucji stopy EFFR i SOFR (**3 pkt**).
+
+>- Czy krótkoterminowe stopê procentow¹ mo¿na uto¿samiaæ z abstrakcyjnym obiektem
+chwilowej stopy procentowej?
+
+## Wnioski z analizy cz. 2 {.smaller}
+
+Oznaczmy przez $B$ proces akumulacji pieni¹dza. Proces ten zwi¹zany jest z chwilow¹ stop¹ procentow¹ poprzez zale¿noœæ:
+$$ B_t = \exp\left\{\int_0^t{r_u\,du}\right\},\quad \forall\,t\ge 0.$$
+gdzie rozpatrywany na wyk³adzie proces chwilowej stopy procentowej by³ zadany
+równaniem:
+$$d\,r_t = \mu(t,r_t)\,dt + \sigma(t, r_t)\,dW_t$$
+przy mierze rzeczywistej $\mathbb{P}$.
+Proces $r$ jest procesem ci¹g³ym, zatem w przybli¿eniu dostajemy nastêpuj¹c¹ zale¿noœæ:
+$$\frac{B_{t+\Delta t}}{B_t}-1 \approx r_t\,\Delta t$$
+
+## Wnioski z analizy cz. 3 {.smaller}
+
+Je¿eli proces $B$ by³by procesem akumulacji zwi¹zanym z jedn¹ z obserwowanych
+krótkoterminowych stóp procentowych, to mielibyœmy:
+$$B_t = \prod_{u=1}^t(1+R_u \,\tau(u-1,u)),$$
+co sugerowa³oby przybli¿on¹ zale¿noœæ $r_t \approx R_t$. Jednak¿e proces $R$ nie ma
+w³asnoœci sugerowanych przez krótkoterminowe stopy procentowe chocia¿by
+dlatego, ¿e proces $R$ jest procesem skokowym i bêdzie mia³ inne w³asnoœci statystyczne ni¿ proces chwilowej stopy procentowej.
+
+Gdzie pope³niliœmy b³¹d?
+
+**Zadanie dodatkowe** Opracowaæ modele ewolucji stopy EFFR i SOFR.
+
+## Chwilowa stopa procentowa {.smaller}
+
+Modele chwilowej stopy procentowej by³y jednymi z pierwszych modeli wykorzystywanych
+na rynku do wyceny obligacji, opcji na obligacje czy te¿ kontraktów cap i floor.
+W miarê przesuwania siê zainteresowania traderów z handlu obligacjami po przez
+proste instrumenty pochodne a¿ po egzotyki, modele by³y coraz bardziej komplikowane
+i dostosowywane, by odzwierciedliæ obserwowane ceny rynkowe instrumentów bazowych
+oraz instrumentów zabezpieczaj¹cych.
+W tym miejscu warto zauwa¿yæ, ¿e proces $B$ rozwa¿any w definicji bezarbitra¿owej
+rodziny cen obligacji jest
+obiektem sztucznym, tak jak i chwilowa stopa procentowa $r$. Nie s¹ to wartoœci
+obserwowane na rynku w przeciwieñstwie do cen obligacji (ale uwaga, nie wszystkie obligacje s¹ zerokuponowe!). 
+
+## Analiza LIBOR 3M cz. 1 {.smaller}
+
+```{r libor, fig.align='center', fig.height=3.5}
+LIBOR3M <- readr::read_csv(file = "../data/USDLIBOR3M.csv", 
+    col_types = readr::cols(DATE = readr::col_date(format = "%Y-%m-%d"), 
+                            USD3MTD156N = readr::col_number()), na=".")
+LIBOR3M <- zoo::zoo(x = LIBOR3M$USD3MTD156N, order.by = LIBOR3M$DATE)
+LIBOR3M <- zoo::na.fill(LIBOR3M, fill="extend")
+LIBOR3M_W <- xts::to.weekly(LIBOR3M, OHLC=FALSE)
+LIBOR3M_M <- xts::to.monthly(LIBOR3M, OHLC=FALSE)
+```
+
+**Zadanie:** PrzeprowadŸ analizê szeregu czasowego stopy LIBOR.
+
+**Rozwi¹zanie.** Nasz¹ analizê rozpoczniemy od wizualnej analizy dziennych
+zmian szeregu czasowego.
+
+```{r libor-fig, fig.align='center', fig.height=3.5}
+autoplot(LIBOR3M) %+% 
+  geom_line(color="orange", size=1) %+% 
+  geom_vline(xintercept = as.Date('2008-09-15'), 
+             color="red", linetype='dashed', size=1) %+%
+  labs(x=NULL, y="LIBOR 3M (%)") %+%
+  theme_bw()
+```
+
+## Analiza LIBOR 3M cz. 2 {.smaller}
+
+```{r libor-diff}
+dLIBOR3M <- diff(LIBOR3M)
+dLIBOR3M_M <- diff(LIBOR3M_M)
+df <- data.frame(
+  ChangeType=c(rep("Daily", length(dLIBOR3M)),c(rep("Monthly", length(dLIBOR3M_M)))),
+  Rate=c(zoo::coredata(dLIBOR3M), zoo::coredata(dLIBOR3M_M)))
+kurt<- c(e1071::kurtosis(dLIBOR3M),e1071::kurtosis(dLIBOR3M_M)) 
+```
+
+Histogram wskazuje, ¿e zmiany w poziomie stóp nie pochodz¹ z rozk³adu normalnego
+(tak czêsto wykorzystywanego w modelowaniu) lecz charakteryzuj¹ siê ciê¿szymi ogonami. Agregacja do miesiêcznych zmian nie zmienia wyników analizy. 
+Kurtoza w przypadku zmian dziennych wynosi `r round(kurt[1],2)` a w przypadku zmian
+miesiêcznych `r round(kurt[2],2)`. 
+
+
+```{r libor-hist, fig.align='center', fig.height=3.5}
+ggplot(data=df, aes(x=Rate,fill="orange")) %+% 
+  geom_histogram(aes( y=..density..), alpha=0.6, bins=200) %+% facet_wrap(~ChangeType, scales="free") %+% theme_bw() %+% theme(legend.position="none")
+```
+
+## Analiza LIBOR 3M cz. 3 {.smaller}
+
+Same odchylenia od normalnoœci mog¹ byæ efektem zale¿noœci pomiêdzy obserwacjami,
+a tak¿e zmian w re¿imie. Spójrzmy na wykresy autokorelacji dla zmian obserwowanych
+do upadku Lehman Brothers i po kryzysie finansowym. Zauwa¿alna jest widoczna zmiana
+w zachowaniu siê stóp procentowych.
+
+```{r libor-acf, fig.align='center', fig.height=5}
+par(mfrow=c(2,2))
+acf(zoo::coredata(diff(window(LIBOR3M, end='2008-09-15'))), col="orange",
+    main="Before LB collapse",xlab=NA)
+acf(zoo::coredata(diff(window(LIBOR3M, start='2008-09-15'))), col="orange",
+     main="After LB collapse",xlab=NA)
+pacf(zoo::coredata(diff(window(LIBOR3M, end='2008-09-15'))), col="orange",
+    main="Before LB collapse",xlab=NA)
+pacf(zoo::coredata(diff(window(LIBOR3M, start='2008-09-15'))), col="orange",
+     main="After LB collapse",xlab=NA)
+par(mfrow=c(1,1))
+##lag.plot(abs(diff(LIBOR3M)),set.lags =3)
+```
+
+## Analiza LIBOR 3M cz. 4 {.smaller}
+
+```{r libor-adf, message=FALSE, warning=FALSE}
+s1 <- tseries::adf.test(window(LIBOR3M, end='2008-09-15'))$statistic
+s2 <- tseries::adf.test(window(LIBOR3M, start='2008-09-15'))$statistic
+```
+
+Czy w szeregu jest obserwowany efekt powrotu do œredniej? 
+
+W zbadaniu tego faktu pos³u¿ymy siê statystykami z testów *unit root*.
+W rozszerzonym teœcie Dickeya-Fullera badamy statystykê $\hat{\beta} / \hat{\sigma}_{\beta}$, gdzie $\beta$ jest wspó³czynnikiem kierunkowym
+w równaniu:
+$$\Delta R_t = a + b\,t + \beta R_{t-1} + \sum_{i=0}^p{\alpha_i\,\Delta R_{t-1+i}} + \varepsilon_t$$
+Test Dickeya-Fullera jest testem na stacjonarnoœæ szeregu czasowego. 
+Intuicja za tak¹ postaci¹ statystyki jest taka, ¿e
+je¿eli $\beta < 0$, to szereg jest stacjonarny i zachodzi efekt powrotu do œredniej,
+a je¿eli $\beta=0$, to zmiany w szeregu da siê przwidzieæ za pomoc¹ poprzednich zmian
+nie wykorzystuj¹c poziomu stóp procentowych.
+
+W przypadku naszego szeregu czasowego statystyka testowa dla pierwszego okresu
+wynosi³a `r format(s1, digits=5)`, podczas gdy dla drugiego wynios³a ona
+`r format(s2, digits=5)`.
+
+## Krótkoterminowe stopy procentowe a poziom stóp {.smaller}
+
+Porównajmy stopê LIBOR 3M oraz EFFR. Na poni¿szym wykresie wyraŸna
+jest zale¿noœæ pomiêdzy obiema stopami realizuj¹ca siê w poziomie tych stóp.
+
+```{r libor-vs-effr, fig.align='center', fig.height=4 }
+zoo::autoplot.zoo(zoo::cbind.zoo(EFFR, LIBOR3M,all=FALSE),facets = NULL) %+% labs(x=NULL, y="Rate (in %)", color="Rate type") %+% theme_bw()
+```
+
+## Jeden czynnik czy wiele? {.smaller}
+```{r read-data, message=FALSE, warning=FALSE}
+library(YieldCurve)
+data("FedYieldCurve")
+tzone(FedYieldCurve)<-'America/New_York'
+mat <- c(3/12, 0.5, 1,2,3,5,7,10)
+```
+
+* Czy wybór EFFR (czy POLONIA) jest dobrym odzwierciedleniem poziomu stóp?
+* Czy jedynym czynnikiem wp³ywaj¹cym na stopy procentowe i stanowi¹cym ich g³ówn¹
+zale¿noœæ jest ich poziom?
+
+```{r fed-yc, fig.align='center', fig.height=4}
+plot(FedYieldCurve)
+```
+
+## Kszta³t krzywych terminowych
+
+```{r curve-shape, fig.align='center', fig.height=6}
+par(mfrow=c(2,2))
+for( i in c("1981-12-31", "1989-12-31", "2000-10-31", "2006-10-31") ){
+plot(mat, FedYieldCurve[i], type="o", xlab="Maturities structure in years", ylab="Interest rates values")
+title(main=paste("Fed Yield Curve in",time(FedYieldCurve[i], sep=" ") ))
+grid()
+}
+par(mfrow=c(1,1))
+```
+
+## Analiza sk³adowych g³ównych (PCA)
+
+Ró¿ne kszta³ty krzywej sugeruj¹, ¿e nie tylko jeden czynnik ma wp³yw na stopy w ró¿nych okresach. Niekoniecznie jest tak, ¿e zmiany na krzywej s¹ równoleg³e (szoki równoleg³e). 
+W dalszej czêœci pos³u¿ymy siê analiz¹ sk³adowych g³ównych celem wykrycia czynników
+ukrytych determinuj¹cych strukturê terminow¹. Zale¿y nam na zmianach krzywej (dynamice) dlatego rozwa¿ymy szereg zró¿nicowany stóp zerokuponowych (zmiany).
+
+Analiza sk³adowych g³ównych jest technik¹ polegaj¹c¹ na znalezieniu ortogonalnych kierunków w danych o najwiêkszej zmiennoœci na podstawie macierzy kowariancji.
+PCA pomaga zredukowaæ wymiar problemu i skupiæ siê na najwa¿niejszych czynnikach wp³ywaj¹cych na dane.
+
+## PCA krzywych zerokuponowych cz.1
+
+```{r pca-yc}
+dFedYieldCurve <- diff(FedYieldCurve)[-1]
+model <- prcomp(dFedYieldCurve, scale = TRUE, center=FALSE)
+summary(model)
+```
+
+## PCA krzywych zerokuponowych cz.2 {.smaller}
+
+Jak widzieliœmy 3 pierwsze komponenty potrafi¹ wyt³umaczyæ ponad $99\%$ zmiennoœci.
+Jak interpretowaæ komponenty?
+
+```{r pc-plot, fig.align='center', fig.height=4}
+
+df <- reshape2::melt(data=data.frame(model$rotation[,c("PC1", "PC2","PC3")],
+                                     Maturity=mat),
+                     id.vars="Maturity", variable.name="Component",
+                     value.name="Loading")
+ggplot(data=df,mapping = aes(x=Maturity, y=Loading, color=Component)) %+% 
+  geom_line(size=1) %+% 
+  geom_hline(yintercept=0,linetype="dashed") %+% 
+  theme_bw() 
+```
+
+

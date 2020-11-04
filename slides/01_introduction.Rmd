@@ -1,0 +1,512 @@
+---
+title: "Wstêp do stóp procentowych"
+author: "Adam Pytel"
+date: "24 wrzeœnia 2020"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Warunki zaliczenia przedmiotu
+
+£¹czna liczba punktów do zdobycia z przedmiotu - 100
+
+* 30 punktów egzamin pisemny, 30 punktów egzamin teoretyczny (test),
+* 2 prace projektowe po 10 punktów ka¿da,
+* 20 punktów zadania domowe,
+* kartkówki - dodatkowe punkty na egzaminie teoretycznym (testowym)
+* zadania z gwiazdk¹, które zmniejszaj¹ liczbê zadañ do zrobienia na egzaminie pisemnym
+
+## Wstêp
+
+Na dzisiejszych æwiczeniach spróbujemy odpowiedzieæ sobie na nastêpuj¹ce pytania:
+
+1. Czym s¹ stopy procentowe i co mierz¹?
+2. Jakie s¹ podstawowe stopy referencyjne?
+3. Jakie rozró¿niamy "rynki" stopy procentowej?
+4. Jaka jest geneza komercyjnych stóp referencyjnych, dlaczego s¹ one wa¿ne 
+dla rynku derywatów i dlaczego obecnie te stopy s¹ zastêpowane?
+
+## Pocz¹tki bankowoœci
+
+Dzia³alnoœæ bankowa siêga czasów œwi¹tyñ w Babilonie, pierwszych
+banków greckich i rzymskich. Pocz¹tkowa dzia³alnoœæ kredytowo-depozytowa powoli przeradza³a siê w dzia³alnoœæ
+inwestycyjn¹. Kredytodawcy czerpali zyski z zainwestowanych pieniêdzy, co
+oznacza, ¿e zainwestowany pieni¹dz mia³ pewn¹ wartoœæ w czasie,
+którego miar¹ jest **stopa zwrotu** lub **stopa oprocentowania depozytu**.
+
+Po wiekach ciemnych, w œredniowiecznych W³oszech, na nowo odkryto bankowoœæ.
+Doprowadzi³y do tego rosn¹ce potrzeby kupców i mo¿nych w³oskich. 
+Schemat dzia³ania banków nie zmienia³ siê przez wieki.
+Du¿a czêœæ depozytów przeznaczona by³a na udzielanie kredytów. 
+**Brak odpowiednich rezerw powodowa³ upadki banków.**
+
+<div class="notes">
+Inwestycje i kredytowanie znane jest od czasów staro¿ytnych. Wœród pierwszych
+instytujcji, które œwiadczy³y us³ugi bankowe by³y m. in. œwi¹tynie w babilonie,
+pierwsze banki greckie i rzymski. Kredytodawcami zostawaliw³adcy, bogaci kupcy
+lub wielcy w³aœciciele ziemscy. Wynalazek pieni¹dza przyczyni³ siê do dynamicznego
+wzrostu wymiany handlowej, a tak¿e wp³yn¹³ znacz¹co na rozwój ludzkoœci po przez
+wzmo¿one inwestycje. Inwestycje powstaj¹ce za pieni¹dze kredytodawców mia³y tym ostatnim przynosiæ zysk, którego miar¹ jest stopa zwrotu z inwestycji.
+Pieni¹dz zainwestowany ma wiêc sam w sobie pewn¹ wartoœæ w czasie.
+
+Banki zosta³y na nowo odkryte w œredniowieczu za spraw¹ zrzeszania siê w³oskich
+kupców/mo¿nych. Podstawowa dzia³alnoœæ banków polega na po¿yczaniu pieniêdzy
+i przyjmowaniu depozytów. Co ciekawe, w tamtym czasie depozyty mia³y czêsto ujemn¹ stopê procentow¹. Schemat dzia³alnoœci banków w ówczesnych czasach nie zmienia³ siê
+przez wieki. Du¿a czêœæ depozytów przeznaczana by³a na udzielane kredyt. Brak
+posiadania odpowiednich rezer przez banki oraz problemy finansowe klientów
+(czêsto w³adców prowadz¹cych liczne wojny) powodowa³y upadki banków.
+</div>
+
+## Rezerwa bankowa | Zabawkowy przyk³ad problemu
+
+**Zadanie 1.** Utwórz prosty model probabilistyczny dynamiki bilansu banku.
+
+1. Wyznacz oprocentowanie kredytów, by pokryæ straty spowodowane
+niesp³acanymi kredytami?
+2. Wyznacz poziom depozytów jaki bank powinien przeznaczyæ na rezerwê by przetrwaæ
+run na bank?
+
+## Rezerwa bankowa | Podejœcie do problemu {.smaller}
+
+Utworzenie modelu to tylko jedno z wielu zadañ, które czekaj¹ przed rozwi¹zuj¹cym problem.
+
+1. Doszczegó³owienie problemu np. jaki jest profil dzia³alnoœci banku.
+2. Okreœlenie celu wraz z kryteriami akceptacji wyniku np. stopa procentowa ma zapewniæ minimalny zysk banku, wynik bêdzie liczb¹ b¹dŸ przedzia³em ufnoœci, akceptacja je¿eli zyskownoœæ osi¹gana w 95% przypadków.
+3. Dobór czynników wp³ywaj¹cych na szukan¹ wartoœæ, wybór danych wejœciowych,
+identyfikacja zale¿noœci pomiêdzy czynnikami.
+4. Okreœlenie za³o¿eñ, budowa modelu oraz kalibracja parametrów modelu.
+5. Testowanie modelu np. na historycznych danych, porównanie z innymi modelami,
+analiza scenariuszowa, zdrowo-rozs¹dkowa ocena modelu.
+
+## Rezerwa bankowa | Przyk³adowe rozwi¹zanie cz. 1 {.smaller}
+
+**UWAGA: Zawsze rozpoczynaj od najprostrzych modeli**
+
+### Uszczegó³owienie problemu
+Rozwa¿any bank jest typow¹ instytucj¹ depozytowo-kredytow¹ prowadz¹c¹ dzia³alnoœæ
+wœród klientów detalicznych. To oznacza, ¿e wielkoœci depozytów i kredytów s¹
+w przybli¿eniu homogeniczne pomiêdzy klientami.
+
+### Postawienie celu
+Z uwagi na posiadanych akcjonariuszy bank powinien wypracowaæ minimalny zysk dla nich. Mo¿emy okreœliæ go w formie procentowej od wartoœci akcji.
+
+### Dobór danych
+Poziom depozytów, aktywa w³asne, kwota udzielonych kredytów, a tak¿e dane makroekonomiczne, prognozy oraz historia *default*-ów. 
+
+
+## Rezerwa bankowa | Przyk³adowe rozwi¹zanie cz. 2 {.smaller}
+
+**Za³o¿enia**
+
+* rozwa¿my jedynie model jednokrokowy z miesiêcznym horyzontem czasowym,
+* aktywa w³asne banku wynosz¹ $A$,
+* w pierwszej czêœci rozpatrujemy brak odp³ywu depozytów -- sta³y poziom depozytów w wysokoœci $D$, 
+* w drugiej czêœci przyjmiemy procentowy odp³yw depozytów równy $R$ (to mo¿e byæ zm. los.),
+* $n$ jest liczb¹ kredytobiorców,
+* $K < D$ jest ³¹czn¹ kwot¹ udzielonych kredytów, ka¿dy klient dosta³ kredyt w wysokoœci $\frac{K}{n}$,
+* indykatory okreœlaj¹ce *default*-y kredytobiorców s¹ niezale¿nymi zmiennymi losowymi (rozk³ad binarny) o p-stwie niewyp³acalnoœci $p$, tzn. $\mathbb{1}_i \sim Bin(1,p)$.
+
+
+## Rezerwa bankowa | Przyk³adowe rozwi¹zanie cz. 3 {.smaller}
+
+Oznaczmy przez $r$ szukana stopa oprocentowania kredytów.
+
+Straty banku: 
+$$L = \sum_{m=1}^n{\frac{K}{n}\mathbb{I}_m} = \frac{K}{n} \cdot N, \quad\textrm{gdzie}\quad N\sim B(n,p)  $$
+By pokryæ straty wypracowany kapita³ powinien byæ wiêkszy ni¿ straty, tzn.
+$$r \cdot \frac{K}{n}(n-N) \ge L. $$
+W jakim sensie ma byæ ta nierównoœæ? Tu jest potrzebne doprecyzowanie np.
+$$P\left(r \cdot K\frac{(n-N)}{n}\ge L\right)\ge 0.95.$$
+
+## Rezerwa bankowa | Przyk³adowe rozwi¹zanie cz. 4 {.smaller}
+
+Stosuj¹c proste przekszta³cenia arytmetyczne otrzymujemy nierównoœæ:
+$$P\left(N\le \frac{r\,n}{1+r}\right)\ge 0.95,$$
+
+która ostatecznie daje nam rozwi¹zanie zadania
+```{r calc_rate, echo=FALSE}
+n <- 5000L
+p <- 0.005
+q <- qbinom(p=0.95, prob=p, size=n)
+rate <- 12*q/(n-q)
+```
+
+Przy parametrach $n=$ `r n` oraz miesiêcznym prawdopodbieñstwie defaultu $p=$ `r p`, zannualizowana stopa kredytu powinna wynosiæ co najmniej $r=$ `r format(rate,digits=4)`.
+
+W modelu nie uwzglêdniliœmy oczekiwañ inwestorów.
+
+>- **Jak uwzglêdniæ oczekiwania inwestorów w naszym prostym modelu?**
+
+## Rezerwa bankowa | Analiza wyników modelu {.smaller}
+
+Zdrowy rozs¹dek podpowiada nam, ¿e dobranie tak niskiej stopy oprocentowania kredytu
+raczej nie zapewni nam przetrwania na rynku. Przede wszystkim za³o¿enie niezale¿noœci
+klientów jest nierealne. Jednym ze sposobów modelowania zale¿noœci jest wprowadzenie
+wspólnego czynnika egzogenicznego $E$ (odpowiadaj¹cego np. stanom recesji czy boomu gospodarczego).  
+
+Czynnik ten bêdzie mia³ poœredni wp³yw na zachowanie klientów banku, co mo¿e
+nam równie¿ pomóc poœrednio w opracowaniu prostego modelu odp³ywu depozytów,
+np. uzale¿niaj¹c stopê odp³ywu depozytów $R$ od stanu gospodarki w nastêpuj¹cy sposób:
+$$ R \mid E={crisis} \sim Beta(\alpha_1,\beta_1) \quad\textrm{oraz}\quad R \mid E={stability} \sim 2*Beta(\alpha_2,\beta_2)$$
+
+## Bank centralny {.smaller}
+
+Upadki banków sk³ania³y rz¹dz¹cych do tworzenia banków pañstwowych, które w teorii
+mia³y byæ instytucjami bezpieczniejszymi. Na pocz¹tku XVI w. pe³ni³y rolê bankiera w³adców za co otrzymywa³y przywilej bicia monet, a z czasem drukowania banknotów.
+W XIX wieku. banki pañstwowe zaczê³y siê stawaæ "bankami ostatniej szansy" 
+(inaczej bankami banków). Kolejne kryzysy i skandale powodowa³y, ¿e banki centralne
+nie tylko pe³ni³y rolê "bankiera" rz¹dów, ale równie¿ zaczêto oczekiwaæ od nich
+by stawa³y siê instytucjami nadzorczymi. 
+
+>- Wspó³czeœnie banki centralne odpowiadaj¹ za politykê pieniê¿n¹ pañstwa.
+>- Ich g³ówne cele to utrzymanie wysokiego zatrudnienia, zachowanie stabilnych cen oraz utrzymanie wzrostu gospodarczego, które realizuj¹ poprzez wp³ywanie na stopy procentowe
+>- W jaki sposób banki centralne wp³ywaj¹ na rynek, a tym samym na gospodarkê?
+
+## Rynek pieniê¿ny a rynek kapita³owy {.smaller}
+
+<div class="notes">
+Jak ju¿ wczeœniej zosta³o wspomniane, fundamentem rozwoju gospodarczego s¹ inwestycje,
+a te bez kredytów nie by³yby w stanie przybraæ takich rozmiarów. Banki odpowiadaj¹
+za przyci¹ganie kapita³u oraz umo¿liwiaj¹ dostarczenie niezbêdnych œrodków firmom
+na inwestycje (poœrednictwo pomiêdzy tymi co maj¹ pieni¹dze a tymi co tych pieniêdzy
+potrzebuj¹).
+</div>
+
+Podmioty gospodarcze maj¹ szereg mo¿liwoœci finansowania. Jednym z nich jest **rynek kapita³owy** (segment rynku finansowego), który umo¿liwia przedsiêbiorstwom zdobycie kapita³u m.in. poprzez:
+
+* emisjê akcji,
+* emisjê d³ugu (obligacje korporacyjne).
+
+Przyjê³o siê, ¿e instrumenty finansowe, którymi obraca siê na rynku kapita³owym,
+maj¹ zapadalnoœæ wiêksz¹ ni¿ 1 rok. Tego typu instrumenty wraz z kredytami konsorcjalnymi (*syndicated loans*) s³u¿¹ finansowaniu d³ugoterminowych inwestycji.
+
+Z kolei **rynek pieniê¿ny**, na którym obraca siê instrumentami finansowymi o zapadalnoœci krótszej ni¿ 1 rok, s³u¿y do finansowania bie¿¹cej dzia³alnoœci
+przedsiêbiorstw. G³ównymi instrumentami tego rynku s¹ 
+
+* po¿yczki krótkoterminowe,
+* certyfikaty depozytowe, 
+* bony skarbowe, 
+* kredyty miêdzybankowe, 
+* krótkoterminowe papiery d³u¿ne przedsiêbiorstw,
+* repo i buy-sell backi,
+
+
+## Rynek pieniê¿ny a rynek kapita³owy {.smaller}
+
+Koszt finansowania przedsiêbiorst w du¿ej mierze jest uzale¿niony od ich wiarygodnoœci kredytowej. W przypadku obligacji korporacyjnych jedn¹ z 
+miar rynkowych okreœlaj¹cych t¹ wiarygodnoœæ jest **Z-Spread**, czyli
+sta³y spread ponad krzyw¹ rz¹dow¹, który nale¿y dodaæ, by wyjœæ na wycenê obligacji.
+
+**Zadanie 2.** ZnajdŸ Z-spread dla obligacji o cenie $99.25$ (na 2020-06-30) o zapadalnoœci 2 lata
+wyp³acaj¹cej kupony podane w poni¿ej tabeli, wykorzystuj¹c podane stopy zerokuponowe krzywej obligacji rz¹dowych (kapitalizacja pó³roczna):
+
+| Nb |     Date  |  Coupon | Treasuery rate (%)|
+|----|:---------:|:-------:|:-----------------:|
+| 1  | 2020-12-30| 1       | 0.5               |  
+| 2  | 2021-06-30| 1       | 1.0               |
+| 3  | 2021-12-30| 1       | 1.2               | 
+| 4  | 2022-06-30| 101     | 1.3               | 
+
+## Rozwi¹zanie zadania 2
+
+$$P = \sum_{i=1}^4{c_i B_s(0,T_i)},$$
+gdzie 
+$$B_s(0,T_i) = \frac{1}{\left(1+\frac{r_i+s}{2}\right)^{i/2}}.$$
+```{r zspreadsol}
+price0 <- 99.5
+dprice <- function(s){
+  r <- c(0.5, 1.0, 1.2, 1.3)/100
+  coupon <- c(1, 1, 1, 101)
+  sum(coupon * (1/(1+(r+s)/2)^((1:4)/2))) - price0
+}
+```
+
+Z powy¿szego równania nale¿y wyznaczyæ numerycznie Z-spread $s$, np. wykorzystuj¹c algorytm Brenta. Spread ten wynosi `r round(uniroot(dprice, c(0,1))$root*10000)`bps.
+
+
+## Stopy referencyjne cz. 1
+
+Rynek pieniê¿ny stanowi swoisty smar dla rynku kapita³owego dostarczaj¹c
+p³ynnoœæ temu drugiemu. Wiêkszoœæ graczy na rynku pieniê¿nym stanowi¹ banki 
+i czêœæ rynku, w którym
+uczestnicz¹, nazywana jest rynkiem miêdzybankowym (*interbank lending market*).
+W sprawnie dzia³aj¹cej gospodarce krótkoterminowe stopy procentowe maj¹ bezpoœrednie
+prze³o¿enie na stopy d³ugoterminowe, zatem zmiany poziomu stóp krótkoterminowych 
+bêd¹ wp³ywa³y na stopy zwrotu instrumentów kapita³owych.
+
+Bank centralny mo¿e wiêc wywieraæ wp³yw na gospodarkê w sposób poœredni po przez
+kszta³towanie stóp procentowych na rynku miêdzybankowym. Okreœla on swój cel,
+zwany stop¹ referencyjn¹, i u¿ywa dostêpnych narzêdzi, by ten cel osi¹gn¹æ.
+
+<div class="notes">
+Banki centralne wyznaczaj¹ stopê referencyjn¹, wokó³ której powinna kr¹¿yæ stopa O/N (*overnight*) po¿yczek miêdzybankowych - jest to tzw. *target*. 
+Banki po¿yczaj¹ miêdzy sob¹, poniewa¿ niektóre z nich maj¹ chwilow¹/permanentn¹
+nadp³ynnoœæ (du¿o pieniêdzy) oraz niedop³ynnoœæ (brakuje im pieniêdzy). St¹d
+te¿ 
+</div>
+
+## Stopy referencyjne cz. 2 {.smaller}
+
+Dodatkowo bank centralny mo¿e wprowadziæ stopê dyskontow¹ oraz stopê lombardow¹
+stanowi¹c¹ swoisty korytarz dla kosztu po¿yczek miêdzybankowych (patrz rysunek).
+
+```{r echo=F, warning=FALSE, message=FALSE,eval=FALSE}
+doc <- xml2::read_xml(x="https://www.nbp.pl/xml/stopy_procentowe_archiwum.xml")
+ch <- xml2::xml_children(doc)
+f <- function(set){
+  id <- xml2::xml_attr(set, "id")
+  rate = readr::parse_double(xml2::xml_attr(set, "oprocentowanie"),
+                             locale = readr::locale(decimal_mark = ","))
+  data.frame(ID=id,Rate=rate, stringsAsFactors = FALSE)
+}
+
+dane <- lapply(ch, function(x) f(xml2::xml_children(x)))
+names(dane) <- xml2::xml_attr(ch, "obowiazuje_od")
+dane <- reshape2::dcast(
+    data=dplyr::bind_rows(dane, .id="PubDate"),
+    formula = "PubDate ~ ID")[,c("PubDate", "dep", "ref", "lom")]
+dane$PubDate <- as.Date(dane$PubDate)
+z <- zoo::zoo(x=dane[,-1], order.by = dane$PubDate)
+zoo::plot.zoo(z,plot.type = "single", col = c("blue", "red","orange"),
+              main="Stopy NBP", xlab="Data", ylab="Stopa (w %)")
+legend("topright", legend=c("Deposit", "Reference", "Lombard"),
+       col=c("blue", "red","orange"), lty = 1)
+```
+
+<div class="notes">
+Bank centralny wyznaczaj¹c stopê depozytow¹ i lombardow¹ buduje przejdzia³ w jakim
+stopa overnightowa mo¿e siê poruszaæ. Mechanizm dzia³a w prosty sposób. Je¿eli
+czêœæ banków komercyjnych potrzebuje pieniêdzy, to zwraca siê do innego banku o po¿yczjê. Naturalnie drugi bank bêdzie chcia³ zarobiæ jak najwiêcej, ale nie mo¿e za¿¹daæ wiêcej ni¿ stopa lombardowa, poniewa¿ bank
+potrzebuj¹cy po¿yczki zwróci siê do banku centralnego. Tak samo w przypadku banku posiadaj¹cego nadprogramowe œrodki. Je¿eli stopa depozytowa overnightowa bêdzie ni¿sza ni¿ stopa depozytowa NBP, to bank zdeponuje pieni¹dze w banku centralnym.
+</div>
+
+## Narzêdzia banku centralnego
+
+1. Stopa rezerwy obowi¹zkowej (procent od depozytów bankowych).
+2. Operacje rynku otwartego (bezwarunkowe i warunkowe).
+3. Stopa depozytowa i lombardowa.
+4. Interwencyjny skup papierów czyli *quantitative easing* (nie tylko obligacji rz¹dowych).
+5. Wymogi kapita³owe dla instytucji finansowych (patrz Bazylea III, IV, CRR2 b¹dŸ Solvency II).
+
+<div class="notes">
+Banki centralne powoli odchodz¹ od stopy rezerwy obowi¹zkowej uznaj¹æ, ¿e wymogi
+kapita³owe s¹ bardziej skuteczne do dyscyplinowania banków.
+Wymogi kapita³owe s¹ narzucane przez Bank of International Settlements (bank
+banków centralnych) celem zabezpieczenia klientów banków przed ich upadkiem).
+Wyró¿niamy wymogi z tytu³u ryzyka kredytowego, ryzyka operacyjnego i ryzyka rynkowego. Oddzielne wymogi powsta³y tak¿e z tytu³u ryzyka kredytowego kontrahenta oraz CVA.
+</div>
+
+## Operacje rynku otwartego cz. 1
+
+Operacje rynku otwartego wykorzystywane przez bank centralny dziel¹ siê na
+
+* operacje bezwarunkowe (skup papierów wartoœciowych b¹dŸ sprzeda¿ papierów wartoœciowych np. 7-dniowych bonów pieniê¿nych),
+* operacje warunkowe wykorzystuj¹ce transakcje repo i reverse repo.
+
+**Zadanie 3.** Oblicz cenê odkupu obligacji zerokuponowej w transakcji repo
+na kwotê 50 mln PLN (7-dniowej) przy za³o¿eniu, ¿e *repo rate* wyniós³ $1.5\%$.
+Jaka bêdzie cena odkupu w przypadku $2\%$ haircut-u?
+
+<div class="notes">
+Operacje rynku otwartego maj¹ na celu przybli¿enie stopy overnightowej do stopy referencyjnej. Operacje podstawowe obejmuj¹ sprzeda¿ b¹dŸ skup papierów wartoœciowych, np. bonów skarbowych. Emisji dokonuje siê w przypadku, gdy
+O/N stopa procentowa jest poni¿ej docelowej stopy referencyjnej, ustalaj¹c odpowiednio atrakcyjn¹ stopê zwrotu na papierach wartoœciowych. Gdy natomiast 
+banki po¿yczaj¹ sobie pieniadze po wy¿szej stopie procentowej ni¿ stopa referencyjna, bank centralny zmniejsza wartoœæ regularnych emisji (tzw. podstawowych), b¹dŸ
+zawiera transakcje repo ze nisk¹ stop¹ procentow¹.
+</div>
+
+## Operacje rynku otwartego cz. 2
+
+**Rozwi¹zanie.**
+Przy $0\%$ haircucie cena bêdzie wynosiæ:
+$$50 + 50\cdot 0.015 \cdot \frac{7}{365} = 50.014384.$$
+Gdy jednak zastosujemy *haircut* $2\%$ cena wyniesie:
+$$\left(50 + 50\cdot 0.015 \cdot \frac{7}{365}\right) \cdot(1-0.02) = 49.014096$$
+
+## Terminowe stopy referencyjne
+
+W latach 60. XX wieku banki finansowa³y kredyty konsorcjalne przy pomocy
+miêdzybankowych depozytów. Udzielanie kredytów po sta³ej stopie powodowa³o
+problemy w bilansie. To sk³oni³o banki do utworzenia pewnego *benchmarku*, 
+który wyznacza³by oprocentowanie kredytów konsorcjalnych, a jednoczeœnie
+zabezpiecza³ zobowiazania banków. Pierwsz¹ transakcjê w której u¿yto jako stopy referencyjnej protoplastê LIBORu,
+zawar³ Minos Zombanakis z Manufacturer's Hanover (obecnie czêœæ JPMorgan)
+z szachem Iranu na kwotê 80 mln $.
+
+LIBOR (*London Interbank Offered Rate*) jest stop¹ referencyjn¹ obliczan¹ jako œrednia uciêta z kwotowañ banków nale¿¹cych do panelu, gdzie banki kwotuj¹ stopê
+po której mog¹ po¿yczyæ œrodki bez zabezpieczenia na rynku miêdzybankowym na okreœlony okres czasu.
+
+<div class="notes">
+Gdy banki zaczê³y intensywnie po¿yczaæ po stopie LIBOR, doprowadzi³o to do powstania
+niezdrowej sytuacji, w której po¿yczaj¹cy mogli ustawiaæ stawki. By zaprzestaæ
+rozprzestrzenianiu siê takich praktyk, BBA objê³o pieczê nad stawk¹ LIBOR i jej
+kalkulacj¹, co unormowa³o sytuacjê. Obecnie wielkoœæ nomina³ów instumentów pochodnych
+opartych o stopy IBOR mo¿na szacowaæ w bilionach.
+</div>
+
+## Floating Rate Notes cz.1 {.smaller}
+
+**Zadanie 4.** Bank o wysokim ratingu kredytowym kupi³ 5-letnie obligacje zmiennokuponowe o ³¹cznym nominale $50$ mln dolarów, która wyp³aca kupony co $6$ miesiêcy  w oparciu o stawkê ICE LIBOR 6M. Zak³adaj¹c, ¿e bank finansuje inwestycjê na rynku miêdzybankowym przy pomocy depozytów miêdzybankowych w dolarze, oblicz wartoœæ obligacji po up³ywie $6$ miesiêcy (tu¿ po wyp³acie kuponu).
+
+**Rozwi¹zanie.** 
+Czas do zapadalnoœci obligacji wynosi $T=4.5Y$,
+a schemat p³atnoœci przedstawia siê w nastepuj¹cy sposób: 
+
+$$\mathcal{T} := \{0.5Y, 1Y, 1.5Y, \ldots, 4Y, 4.5Y\}.$$
+
+Nomina³ transakcji, wynosz¹cy $N=50$ mln dolarów, wyp³acany jest w dacie zapadalnoœci, a przysz³e kupony wynosz¹:
+$$ C_i = N\cdot\frac{180}{360}\cdot L(T_{i-1},T_{i}), $$
+dla $i=1,2,\ldots,9$, gdzie $T_0 = 0$ i $L(T_{i-1},T_{i})$ jest stop¹ ICE LIBOR 6M
+za okres $(T_{i-1},T_{i}]$. 
+
+## Floating Rate Notes cz.2 {.smaller}
+
+Krzywa dyskontowa i krzywa projekcyjna s¹ takie same, poniewa¿ bank finansuje siê
+przy pomocy depozytów dolarowych, zatem czynnik dyskontowy na okres $(T_{i-1},T_i]$
+wynosi:
+$$B(T_{i-1},T_i) = \frac{1}{1+\frac{180}{360}L(T_{i-1},T_{i})}.$$
+Proces kapitalizacji (proces rachunku bankowego) w ustalonych momentach czasu wynosi:
+$$ B_{T_i} = \prod_{k=1}^i{\left(1+\frac{180}{360}L(T_{k-1},T_{k})\right)}$$
+
+## Floating Rate Notes cz. 3 {.smaller}
+Zale¿noœci te pozwalaj¹ nam obliczyæ cenê ostatniego przep³ywu transakcji
+na chwilê $4Y$, tzn.
+$$\pi_{4Y}(N + C_9) = \mathbb{E}\left(\frac{B_{4Y}}{B_{4.5Y}}(N+C_9)\mid\mathcal{F}_{4Y}\right) = N\cdot \frac{1+\frac{180}{360}L(4Y,4.5Y)}{1+\frac{180}{360}L(4Y,4.5Y)}=N$$
+Postêpuj¹c iteracyjnie otrzymujemy cenê naszej obligacji tu¿ po wyp³acie kuponu w wysokoœci wartoœci nomina³u, czyli 50 mln dolarów.
+
+## Liniowe instrumenty pochodne na stopê procentow¹
+
+Najwa¿niejszymi liniowymi instrumentami pochodnymi na stopy procentowe s¹:
+
+* swapy np. *interest rate swap*, *basis tenor swap*, *cross-currency basis swap* (w przewa¿aj¹cej czêœci OTC),
+* kontrkaty futures na stopê (gie³da),
+* FRA (*floating rate agreement*) (OTC).
+
+Wœród innych instrumentów liniowych nale¿y wymieniæ:
+
+* kontrakty futures na obligacje (gie³dy),
+* kontrakty forward na obligacje (OTC).
+
+## Kontrakt FRA {.smaller}
+
+W klasycznym kontrakcie FRA wystawionym na okres $[T_1,T_2]$ wyp³ata 
+w chwili $T_2$ wynosi:
+$$N \cdot \tau(T_1,T_2) \left(L(T_1,T_2) - K\right), $$
+gdzie $\tau$ jest frakcj¹ roku obliczon¹ dla przedzia³u $[T_1,T_2]$ przy u¿yciu odpowiedniej konwencji liczenia dni (dla EUR i USD jest Act/360, dla GBP jest Act/365). 
+
+**Zadanie 5.** Przyjmimy, ¿e zachodz¹ warunki z poprzedniego zadania.
+
+1. Wyznacz stopê FRA ($K$) dla której wejœcie w kontrakt w chwili $t=0$ jest bezkosztowe.
+2. Za³ó¿my, ¿e kwotowana wartoœæ stopy FRA spe³ania zale¿noœæ $K > F(T_1, T_2)$.
+Jak¹ strategiê nale¿y przyj¹æ, by wykorzystaæ arbitra¿ na rynku?
+3. Wiedz¹c, ¿e na chwilê $t=2012/12/11$ EURIBOR 3M wynosi $0.18\%$, a EURIBOR 6M wynosi $0.32\%$, oblicz teoretycznie stopê kontraktu FRA 3x6 (u¿yj odpowiedniej konwencji).
+4. Stopa FRA w tamtym dniu wynosi³a $0.154\%$. Wyjaœnij, jakie mog¹ byæ przyczyny ró¿nicy pomiêdzy teoretyczn¹ wartoœci¹ a kwotowan¹.
+
+## Kontrakt FRA - rozwi¹zanie cz.1 {.smaller}
+
+**Rozwi¹zanie.** Wyp³atê w kontrakcie FRA mo¿emy przedstawiæ w nieco inny sposób:
+$$N \cdot(1+\tau(T_1,T_2) L(T_1,T_2)) - N \cdot(1+\tau(T_1,T_2)K). $$
+Pierwszy cz³on wyp³aty jest wyp³at¹ z depozytu z³o¿onego na okres $[T_1, T_2]$ w wysokoœci $N$. By móc mieæ taki depozyt w chwili $T_1$ nale¿y mieæ w chwili $t=0$
+$N / (1+\tau(T_0,T_1) L(T_0,T_1))$ kapita³u. Jako, ¿e nasza transakcja w chwili inicjacji jest bezkapita³owa, to ten kapita³ po¿yczamy w chwili $0$ i oddajemy w chwili $T_2$.
+Kapita³ jest oprocentowany stop¹ $L(T_0,T_2)$, zatem w chwili $T_2$ powinniœmy sp³aciæ:
+$$N \cdot \frac{1+\tau(T_0,T_2) L(T_0,T_2)}{1+\tau(T_0,T_1) L(T_0,T_1)}.$$
+Je¿eli na rynku mia³oby nie byæ arbitra¿u, to stopa FRA powinna wynosiæ dok³adnie:
+$$K = \frac{1}{\tau(T_1,T_2)}\left(\frac{\tau(T_0,T_2) L(T_0,T_2)-\tau(T_0,T_1) L(T_0,T_1)}{1+\tau(T_0,T_1) L(T_0,T_1)}\right) =: F(T_1,T_2).$$
+
+## Kontrakt FRA - rozwi¹zanie cz.2 {.smaller}
+
+Je¿eli $K>F(T_1,T_2)$, to sprzedajemy kontrakt FRA, po¿yczamy $N\cdot B(0,T_1)$ na okres $[0,T_2]$ i wp³acamy na depozyt na okres $[0,T_1]$. Po tym czasie po¿yczamy
+te pieniadze (b¹dŸ wp³acamy na depozyt) na okres $[T_1,T_2]$,
+by w momencie $T_2$ z naros³ych odsetek zap³aciæ w kontrakcie FRA, a resztê
+przeznaczyæ na sp³atê nomina³u uprzednio zaci¹gniêtego kredytu. Reszta naros³ych
+odsetek bêdzie mniejsza ni¿ wyp³ata z kontraktu FRA, zatem nasza strategia
+przynios³a zysk. W przypadku odwrotnej nierównoœci stosujemy odwrotn¹ strategiê.
+
+Celem obliczenia teoretycznej stopy FRA potrzebujemy na pocz¹tku obliczyæ daty
+depozytów/po¿yczek. Dziœ ustalone depozytu rozpoczynaj¹ swój okres rozliczeniowy
+od daty spot, co w przypadku EUR wi¹¿e siê z przesuniêciem o 2 dni daty wyjœciowej, czyli $2012/12/13$. Data startu FRA, bêd¹ca jednoczeœnie dat¹ zapadalnoœci $T_1$ depozytu to  $2013/03/13$, a data koñca kontraktu $T_2$ b¹dŸ koñca po¿yczki to $2013/06/13$.
+
+## Kontrakt FRA - rozwi¹zanie cz.3 {.smaller}
+
+Obliczmy na pocz¹tku frakcje roku:
+$$\tau(T_0,T_1) = \frac{90}{360} = 0.25$$
+$$\tau(T_0,T_2) = \frac{182}{360}, \quad \tau(T_1,T_2) = \frac{92}{360}$$
+Podstawiaj¹c do wzoru na stopê FRA otrzymujemy:
+$$F(T_1, T_2) = \frac{360}{92}\frac{\frac{182}{360}\cdot 0.32\%-0.25\cdot 0.0018}{1+0.25\cdot 0.18\%} = 0.46\%$$
+
+Obserwowana w tamtym dniu stopa dla kontraktu FRA wynosi³a jedynie $0.154\%$.
+**Sk¹d siê bierze tak du¿a ró¿nica?** Przekszta³caj¹c wzór na stopê FRA otrzymamy
+zale¿noœæ czynników kapitalizuj¹cych:
+$$(1+\tau(T_0,T_1)\cdot L(T_0,T_1)) \cdot (1+\tau(T_1,T_2)\cdot F(T_1,T_2)) = (1+\tau(T_0,T_2)\cdot L(T_0,T_2))$$
+
+## Kontrakt FRA - rozwi¹zanie cz.4 {.smaller}
+
+Po rozwiniêciu i pominiêciu wartoœci marginalnych dostajemy przybli¿on¹ zale¿noœæ:
+$$L(0,T_2) = \omega \cdot L(0,T_1) + (1-\omega) \cdot F(T_1,T_2), $$
+gdzie $\omega = \frac{\tau(T_0,T_1)}{\tau(T_0,T_2)}$. Zatem zgodnie z tym wzorem
+stopa $L(T_0,T_2)$ powinna wynosiæ oko³o $0.167\%$.
+
+>- Ró¿nica wynika przede wszystkim z okresu depozytowego i zwi¹zanego z nim ryzyka kredytowego. Rynkowa stopa $L(T_0,T_2)$ zawiera wbudowany komponent kredytowy,
+dlatego niezmiernie wa¿ne jest rozró¿nianie krzywych wykorzystywanych w obliczeniach.
+Inn¹ charakterystyke bêd¹ mia³y instrumentu oparte na stopie EURIBOR 3M, a inne na stopie EURIBOR 6M. 
+
+>- Problem w obecnych czasach stanowi równie¿ za³o¿enie, ¿e bank finansuje siê depozytami. W ci¹gu 40 lat banki rozwinê³y szereg narzêdzi i instrumentów sprzyjaj¹cych finansowaniu swojej dzia³alnoœci. To w znacz¹cym stopniu wp³ywa na to
+jak bank dyskontuje swoje przep³ywy. 
+
+<div class="notes">
+
+</div>
+
+## Forward IRS - zadanie {.smaller}
+
+**Zadanie 6.** Rozwa¿my kupiony 18 miesiêczny kontrakt forward swap rozpoczynaj¹cy siê za 3 miesi¹ce w którym noga sta³a jest wymieniana z nog¹ zmienn¹ w tych samych datach, a sam kontrakt swap opiera siê o stopê EURIBOR 6M. Niech $B_{d}(0,\cdot)$ bêdzie krzyw¹ dyskontow¹, a $F_{6M}(T, T+6M)$ bêd¹ kwotowanymi stopami FRA.
+
+1. WyraŸ stopê swapow¹ jako odpowiedni¹ œredni¹ stóp FRA, wiedz¹c, ¿e rozpatrywany kontrakt ma chwili inicjacji cenê $0$.
+2. Oblicz stopê swapow¹ korzystaj¹c z poni¿szych danych:
+
+| $T_i$ | $F(T_i,T_i+6M)$ |  $B(T_0,T_i)$ |
+|-----|:-------------:|:-----------:|
+| 3M  | 0.26          | 0.999548    |  
+| 9M  | 0.267         | 0.9989097   | 
+| 15M | 0.352         | 0.9976962   |
+| 21M | 0.46          | 0.9964085   |
+
+## Forward IRS - rozwi¹zanie cz. 1 {.smaller}
+
+**Rozwi¹zanie.** Kontrakt swapawy oraz kontrakty FRA maj¹ wspóln¹ sk³adow¹,
+a mianowicie kupony zmienne w formie 
+$$\tau(T_i,T_i+6M)\cdot L(T_{i},T_i+6M).$$ P³atnoœci na nodze zmiennej w swapie mo¿na zatem zreplikowaæ (hedgowaæ) przy pomocy kupna (sprzeda¿y) trzech kontraktów FRA: FRA3x9, FRA9x15, FRA15x21. Sprzedaj¹c kontrakty FRA, zamieniamy ci¹g naszych p³atnoœci na wymianê sta³ych kuponów. Wartoœæ ka¿dego z przep³ywów wyra¿a siê wzorem:
+$$\pi_{0}(C_{instr,i}) = \mathbb{E}_{\mathbb{P}^*}\left(\frac{C_{instr}(T)}{B_T}\right) = C_{instr}(T) B(0,T), $$
+gdzie $instr\in\{FRA,IRS\}$ oraz $T$ jest momentem przep³ywu. 
+
+## Forward IRS - rozwi¹zanie cz. 2 {.smaller}
+Wejœcie w ka¿dy z kontraktów by³o bezkosztowe
+dlatego te¿ wartoœæ obu strumieni przep³ywów na chwilê $T_0$ jest równa, co oznacza, ¿e:
+$$
+\begin{equation}
+\begin{aligned}
+\kappa  & \left(B(0,9M)\tau(3M,9M) + B(0,15M) \tau(9M,15M) + B(0,21M) \tau(15M,21M)\right)\\ 
+& = B(0,9M)\tau(3M,9M) F_{6M}(3M,9M) \\ 
+&\quad + B(0,15M) \tau(9M,15M)  F_{6M}(9M,15M) \\ 
+&\quad + B(0,15M) \tau(15M,21M) F_{6M}(15M,21M).
+\end{aligned}
+\end{equation}
+$$
+
+Z powy¿szego otrzymujemy ostateczny wzór na stopê swapow¹:
+
+$$\kappa = \omega_1  F_{6M}(3M,9M) + \omega_2  F_{6M}(9M,15M) + \omega_3  F_{6M}(15M,21M), $$
+
+gdzie $$\omega_i = \frac{B(0,3M+i \cdot 6M) \tau(3M+(i-1) \cdot 6M, 3M+i \cdot 6M)}{A(0,21M)}.$$
+
+```{r calc_swap_rate, echo=FALSE}
+fwd <- c(0.26, 0.267, 0.352) / 100
+disc <- c(0.9989097,0.9976962,0.9964085)
+tau <- 0.25
+A0 <- sum(tau*disc)
+swap_rate = sum(tau*disc*fwd/A0)
+```
+
+Na podstawie danych podanych w tabeli stopa swapowa powinna wynosiæ `r format(swap_rate*100, digits=4)`%

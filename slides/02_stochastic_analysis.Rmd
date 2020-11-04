@@ -1,0 +1,157 @@
+---
+title: "Powtórka z analizy stochastycznej"
+author: "Adam Pytel"
+date: "22 paŸdziernika 2020"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Wstêp
+
+Dzisiejsze zajêcia maj¹ za zadanie odœwie¿yæ wiadomoœci poznane na przedmiocie
+"Podstawy Analizy Stochastycznej" i naœwietliæ rolê jak¹ analiza stochastyczna 
+odgrywa we wspó³czesnej matematyce finansowej.
+
+G³ównym tematem bêdzie zagadnienie zamiany miary szeroko wykorzystywane 
+przy wycenie instrumentów pochodnych.
+
+## Podstawowa ró¿nica w miarach
+
+Ka¿da rozwa¿ana miara martynga³owa $P^\ast$ jest jedynie miar¹ techniczn¹,
+narzêdziem pozwalaj¹cym oderwaæ siê od zagadnienia modelowania dryfu. To przestrzeñ
+probabilistyczna z miar¹ rzeczywist¹ ma odzwierciedlaæ widzian¹ rzeczywistoœæ.
+Punkt widzenia jest subiektywny, dlatego te¿ ka¿dy inwestor czy dealer, je¿eli
+by³by w stanie opisaæ t¹ miarê, najprawdopodbniej opisa³by j¹ w nieco inny sposób,
+niekoniecznie zbie¿ny z innym dealerem/traderem.
+
+**Uwaga:** ¯aden dealer nie pos³uguje siê na codzieñ pojêciem miary probabilistycznej ;).
+
+## Zamiana miary a martynga³y cz.1 {.smaller}
+
+**Zadanie 1.** Rozwa¿my dwie równowa¿ne miary probabilistyczne $\mathbb{P}$ i $\mathbb{Q}$ na przestrzeni probabilistycznej z filtracj¹ $(\Omega, \mathcal{F}, \mathbb{F})$, gdzie $\mathcal{F}_0$ jest $\sigma$-cia³em trywialnym, a $T>0$ jest ustalonym horyzontem czasowym. Definiujemy proces $\eta$:
+$$\eta_t:=\mathbb{E}_{\mathbb{P}}\left(\frac{d\mathbb{Q}}{d\mathbb{P}}\mid \mathcal{F}_t\right),\quad t\in[0,T]. $$
+
+- SprawdŸ bezpoœrednio z definicji, ¿e proces $\eta_t,\ t\in[0,T]$ jest œciœle dodatnim $\mathbb{P}$-martynga³em wzglêdem filtracji $\mathbb{F}$ takim, 
+¿e $\eta_0=1$.
+- Wykorzystuj¹c abstrakcyjn¹ formu³ê Bayesa, wyka¿, ¿e $\mathbb{F}$-adaptowany proces $(M_t)_{[0,T]}$ jest $\mathbb{Q}$-martynga³em wzglêdem $\mathbb{F}$ wtedy i tylko wtedy, gdy proces $(M_t\eta_t)_{[0,T]}$ jest $\mathbb{P}$-martynga³em.
+
+## Zamiana miary a martynga³y cz.2 {.smaller}
+
+**Rozwi¹zanie:** 
+Wiedz¹c, ¿e gêstoœæ Radona-Nikodyma miar probabilistycznych jest zmienn¹ losow¹ nieujemn¹, otrzymujemy z czysto probabilistycznego faktu, ¿e $\eta$ jest martynga³em nieujemnym. Za³ó¿my jednak, ¿e dla pewnego $t>0$ zbiór
+$$N = \{\eta_t = 0\} $$
+ma miarê $\mathbb{P}$ dodatni¹. Oznacza to, ¿e 
+$$
+\begin{align}
+0 & = \mathbb{E}_{\mathbb{P}}\left(\eta_t \mathbb{I}_N\right) = \mathbb{E}_{\mathbb{P}}\left(\mathbb{E}_{\mathbb{P}}\left(\frac{d\mathbb{Q}}{d\mathbb{P}}\mid \mathcal{F}_t\right) \mathbb{I}_N\right) = \mathbb{E}_{\mathbb{P}}\left(\mathbb{E}_{\mathbb{P}}\left(\frac{d\mathbb{Q}}{d\mathbb{P}} \mathbb{I}_N\mid \mathcal{F}_t\right)\right) \\
+ & =\mathbb{E}_{\mathbb{P}}\left(\frac{d\mathbb{Q}}{d\mathbb{P}} \mathbb{I}_N\right) = \mathbb{Q}(N)
+\end{align}
+$$
+gdzie pierwsza równoœæ wynika z definicji zbioru $N$, druga z definicji procesu $\eta$, trzecia z przynale¿noœci $N\in\mathcal{F}_t$, czwarta z w³asnoœci warunkowej wartoœci oczekiwanej, a pi¹ta z definicji gêstoœci Radona-Nikodyma. Za³o¿yliœmy,
+¿e miara $P$ zbioru $N$ jest dodatnia, zatem przez równowa¿noœæ miar, tak¿e miara $Q$ zbioru $N$ jest dodatnia, co stoi w sprzecznoœci z powy¿szym ci¹giem nierównoœci.
+St¹d dla ka¿dego $t\in[0,T]$ mamy $\mathbb{P}(\eta_t>0)=1$. 
+
+## Zamiana miary a martynga³y cz.3 {.smaller}
+
+Skoro $\eta$ jest martynga³em, to posiada nierozró¿nialn¹ modyfikacjê *cadlag*, a ta w³asnoœæ
+z argumentem gêstoœciowym poci¹ga za sob¹ œcis³¹ dodatnioœæ procesu, czyli:
+$$\mathbb{P}\left(\forall\,t\in[0,T]\ \eta_t > 0\right)=1.$$
+
+PrzejdŸmy do dalszej czêœci zadania. Niech $M$ bêdzie $\mathbb{Q}$-martynga³em.
+Wtedy proces $M \eta$ jest $\mathbb{F}$-adaptowany, poniewa¿ jest iloczynem dwóch procesów adaptowalnych i jest ca³kowalny, co wynika z nieujemnoœci pochodnej Radona-Nikodyma i w³asnoœci warunkowej wartoœci oczekiwanej. SprawdŸmy warunek martynga³owy dla ustalonych $t,s$ takich, ¿e $t\ge s$:
+$$
+\begin{align}
+\mathbb{E}_{\mathbb{P}}\left(M_t \eta_t \mid \mathcal{F}_s\right) = \mathbb{E}_{\mathbb{P}}\left(M_t \eta_T \mid \mathcal{F}_s\right) = \mathbb{E}_{\mathbb{Q}}\left(M_t \mid \mathcal{F}_s\right) \mathbb{E}_{\mathbb{P}}\left(\eta_T \mid \mathcal{F}_s\right) = M_s \eta_s,
+\end{align}
+$$
+gdzie w pierwszej równoœci skorzystaliœmy z w³asnoœci teleskopowej w.w.o.,
+a w drugim z uogólnionego twierdzenia Bayesa. 
+
+## Zamiana miary a martynga³y cz.4 {.smaller}
+
+Zak³adaj¹c z kolei, ¿e proces $M\eta$
+jest $\mathbb{P}$-martynga³em otrzymujemy wprost z uogólnionego twierdzenia Bayesa, ¿e
+$$
+\begin{align}
+\mathbb{E}_{\mathbb{Q}}\left(M_t \mid \mathcal{F}_s\right) & = \frac{\mathbb{E}_{\mathbb{P}}\left(M_t \eta_T \mid \mathcal{F}_s\right)}{\mathbb{E}_{\mathbb{P}}\left(\eta_T \mid \mathcal{F}_s\right)} = \frac{\mathbb{E}_{\mathbb{P}}\left(\mathbb{E}_{\mathbb{P}}\left(M_t\eta_T\mid \mathcal{F}_t\right) \mid \mathcal{F}_s\right)}{\eta_s} \\ & = \frac{\mathbb{E}_{\mathbb{P}}\left(M_t \ \mathbb{E}_{\mathbb{P}}\left(\eta_T\mid \mathcal{F}_t\right) \mid \mathcal{F}_s\right)}{\eta_s} 
+= \frac{\mathbb{E}_{\mathbb{P}}\left(M_t \ \eta_t \mid \mathcal{F}_s\right)}{\eta_s}
+ \\ & = \frac{M_s \eta_s}{\eta_s} = M_s,
+\end{align}
+$$
+co ostatecznie dowodzi tezy z zadania.
+
+## Tworzenie równowa¿nych miar martynga³owych cz.1 {.smaller}
+
+Z poprzedniego zadania mo¿emy wnioskowaæ, ¿e bior¹c dowoln¹ œciœle dodatni¹, $\mathcal{F}_T$-mierzaln¹ i $\mathbb{P}$-ca³kowaln¹ zmienn¹ losow¹ $Z$ mo¿emy utworzyæ poprawn¹
+zamianê miary na now¹ miarê równowa¿n¹ $\mathbb{Q}$ po przez gêstoœæ Radona-Nikodyma:
+$$\frac{\mathbb{dQ}}{\mathbb{dP}} = \frac{Z}{\mathbb{E}_{\mathbb{P}}(Z)}.$$
+Jak widzieliœmy na wyk³adzie,
+zamiana miary z rzeczywistej na martynga³ow¹ usuwa nam nieznany dryf, odzwierciedlaj¹cy czêsto subiektywne opinie inwestorów. Technika zamiany miary
+pozwala równie¿ na sformu³owanie problemu wyceny w jezyku innych *numeraire* ani¿eli
+standardowego (i czêsto abstrakcyjnego) "rachunku bankowego".
+
+## Tworzenie równ. miar mart. cz.2 {.smaller}
+
+**Zadanie 2.** Niech $\mathbb{P}$ i $\mathbb{Q}$ bêd¹ dwoma równowa¿nymi miarami
+martynga³owymi odpowiadaj¹cymi *numeraire* $Z^1$ i $Z^2$. Ogólna postaæ zamiany
+miary jest nastêpuj¹ca:
+$$\frac{\mathbb{dQ}}{\mathbb{dP}} = \frac{Z^1_0}{Z^2_0} \cdot \frac{Z^2_T}{Z^1_T}.$$
+
+1. ZnajdŸ postaæ zamiany miary w modelu Blacka-Scholesa przyjuj¹æ, ¿e miara $\mathbb{P}^\ast$ odpowiada procesowi rachunku bankowego, a $\mathbb{Q}$ procesowi cen akcji $S$. ZnajdŸ dynamikê zdyskontowanego procesu $B^\ast = \frac{B}{S}$ przy mierze $\mathbb{P}$ oraz mierze $\mathbb{Q}$.  
+2. ZnajdŸ zamianê miary $\frac{\mathbb{dP}_T}{\mathbb{dP}^\ast}$ w przypadku bezarbitra¿owej rodziny cen obligacji wiedz¹c, ¿e
+miara $\mathbb{P}^\ast$ odpowiada procesowi akumulacji kapita³u $B$, a miara $\mathbb{P}_T$ odpowiada procesowi ceny obligacji zerokuponowej o terminie zapadalnoœci $T$ (miara ta jest nazywana miar¹ $T$-forward). Jak¹ postaæ przyjmuje
+proces $\eta$?
+
+## Tworzenie równ. miar mart. cz.3 {.smaller}
+
+**Rozwi¹zanie:** Zacznijmy od punktu 1. W modelu Blacka-Scholesa proces rachunku
+bankowego jest procesem deterministycznym. Wraz z procesem cen akcji oba z nich
+w chwili $T$ przyjmuj¹ wartoœæ:
+$$B_T = e^{r\, T},\quad S_T = S_0 \, e^{(r-\sigma^2/2)\,T + \sigma\,W_T}, $$
+gdzie $W$ jest procesem Wienera przy mierze martynga³owej $\mathbb{P}^\ast$.
+Korzystaj¹c z wzoru na zamianê miary otrzymujemy:
+$$\frac{\mathbb{dQ}}{\mathbb{dP}^\ast} = \frac{B_0 \, S_T}{S_0 \, B_T} = e^{ \sigma\,W_T - \frac{\sigma^2\,T}{2}}. $$
+ZnajdŸmy teraz dynamikê procesu $B^\ast$ przy dwóch ró¿nych miarach. 
+Rozpoczniemy od znalezienie dynamiki procesu $1/S$ korzystaj¹c z lematu Ito:
+$$
+\begin{align}
+d\frac{1}{S_t} & = -\frac{1}{S^2_t}\,dS_t + \frac{1}{2} \frac{2}{S^3_t} d[S]_t = 
+\frac{1}{S_t} \left(-r\,dt - \sigma\,dW_t\ + \sigma^2\,dt  \right)\\
+& = \frac{1}{S_t} \left((\sigma^2-r)\,dt - \sigma\,dW_t  \right)
+\end{align}
+$$
+
+## Tworzenie równ. miar mart. cz.4 {.smaller}
+
+Na podstawie stochastycznej wersji lematu Leibnitza mamy:
+$$
+\begin{align}
+d\left(\frac{B}{S}\right)_t & = B_t \,d\left(\frac{1}{S}\right)_t + \frac{1}{S_t}\,dB_t + d[B,1/S]_t = \frac{B_t}{S_t}\left(\sigma^2\,dt - \sigma\,dW_t\right)
+\end{align}
+$$
+Dynamika ta nie zmienia siê przy zamianie miary, jednak¿e proces $W$ nie jest ju¿ procesem Wienera. Zatem o ile opis samego procesu nie ulega zmianie, to w³asnoœci
+probabilistyczne/stochastyczne s¹ ju¿ inne.
+Z twierdzenia Girsanowa wiemy, ¿e proces zadany równoœci¹:
+$$ W^{\mathbb{Q}}_t = W_t - \int_0^T{\sigma \,dt }$$ 
+jest procesem Wienera przy mierze $Q$. To pozwala nam na zapisanie poprzedniego
+równania dynamiki w innym jêzyku:
+$$
+\begin{align}
+d\left(\frac{B}{S}\right)_t & = \frac{B_t}{S_t}\left(\sigma^2\,dt - \sigma\,dW_t\right) = \frac{B_t}{S_t}\left(\sigma^2\,dt - \sigma^2 \, dt - \sigma\,dW^{\mathbb{Q}}_t\right) = -\frac{B_t}{S_t}\,dW^{\mathbb{Q}}_t.
+\end{align}
+$$
+
+## Tworzenie równ. miar mart. cz.5 {.smaller}
+
+PrzejdŸmy do drugiej czêœci zadania. Tak jak w pierwszym punkcie wystarczy podstawiæ do wzoru odpowiednie ceny aktywów:
+$$\frac{\mathbb{dQ}}{\mathbb{dP}^\ast} = \frac{B_0 \, B(T,T)}{B(0,T) \, B_T} =  \frac{1}{B(0,T) \, B_T}. $$
+
+Proces $\eta$ definiowany jest jako martynga³:
+$$
+\begin{align}
+\eta_t & = \mathbb{E}_{\mathbb{P}^\ast}\left(\frac{d\mathbb{Q}}{d\mathbb{P^\ast}}\mid \mathcal{F}_t\right) = \mathbb{E}_{\mathbb{P^\ast}}\left(\frac{1}{B(0,T) \, B_T}\mid \mathcal{F}_t\right) \\ & = \frac{1}{B(0,T)}\mathbb{E}_{\mathbb{P^\ast}}\left(\frac{B_t}{B(0,T)_t \, B_T}\mid \mathcal{F}_t\right)  = \frac{B(t,T)}{B(0,T)\, B_t}
+\end{align}
+$$
