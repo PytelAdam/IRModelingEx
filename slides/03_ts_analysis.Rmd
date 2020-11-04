@@ -122,7 +122,7 @@ Przeszkody na jakie natrafi nasz model, to miêdzy innymi:
 * zmiany w polityce pieniê¿nej i podatkowej,
 * wprowadzenie nowych instrumentów i "przesuniêcie" p³ynnoœci (patrz WIBOR)
 
-**Zadanie dodatkowe** Opracowaæ modele ewolucji stopy EFFR i SOFR (**3 pkt**).
+**Zadanie dodatkowe** Opracowaæ modele ewolucji stopy EFFR i SOFR (**4 pkt**).
 
 >- Czy krótkoterminowe stopê procentow¹ mo¿na uto¿samiaæ z abstrakcyjnym obiektem
 chwilowej stopy procentowej?
