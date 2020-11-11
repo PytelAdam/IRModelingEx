@@ -1,0 +1,289 @@
+---
+title: "Modele chwilowej stopy procentowej"
+author: "Adam Pytel"
+date: "7 listopada 2020"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+\DeclareMathOperator{\sign}{sign}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\P}{\mathbb{P}}
+\newcommand{\Ff}{\mathcal{F}}
+
+## Wstêp {.smaller}
+
+Pierwsza generacja modeli stóp procentowych u¿ywana do wyceny instrumentów finansowych
+powsta³a tu¿ po publikacji modelu Blacka-Scholesa. Modele te skupi³y siê na opisie
+chwilowej stopy procentowej. G³ównym celem tych modeli by³o uzyskanie analitycznych
+wzorów na cenê instrumentów pochodnych, b¹dŸ prostych i szybkich algorytmów
+umo¿liwiaj¹cych wycenê tych¿e instrumentów (drzewa dwu- i trójmianowe, metoda
+ró¿nic skoñczonych). 
+
+Pocz¹tkowo modele s³u¿y³y traderom do wyceny obligacji (na podstawie paru p³ynnych
+serii kalibrowano model i szacowano cenê mniej p³ynnych serii). Gdy zainteresowanie
+traderów przenios³o siê z rynku obligacji na instrumenty pochodne, pierwsza
+generacja modeli (potocznie zwana modelami równowagi b¹dŸ *equilibrium*)
+przesta³a spe³niaæ swoje podstawowe funkcje. Nie mniej jednak modele te nadal
+s¹ wykorzystywane w ró¿nych obszarach, m. in. w zarz¹dzaniu ryzykiem, prognozach
+i stress testach.
+
+## Model CIR - wstêp
+
+Na wyk³adzie zosta³ zaprezentowany przyk³adowy model chwilowej stopy procentowej - model Vasicka. W modelu tym chwilowa stopa procentowa ma rozk³ad gaussowski.
+W zwi¹zku z tym prawdopodobieñstwo tego, ¿e stopa procentowa bêdzie poni¿ej 0
+jest dodatnie. Taka w³asnoœæ modelu w czasach w których obserwowane stopy procentowe
+by³y na poziomie $[4\%, 15\%]$ by³a uwa¿ana za wadê modelu (w obecnych czasach
+na niektórych walutach jest to raczej zalet¹ ni¿ wad¹). Ponadto, jak wiadomo,
+rozk³ad gaussowski nie jest rozk³adem ciê¿koogonowym, podczas gdy empiryczne
+rozk³ady stóp procentowych charakteryzuj¹ siê ciê¿kimi ogonami.
+
+Model CIR w czêœci rozwi¹zuje te problemy (choæ zauwa¿ona to raczej post factum).
+
+
+## Model CIR - uproszczenie cz.1
+
+**Zadanie 1.** Za³ó¿my, ¿e proces chwilowej stopy procentowej zdefiniowany jest
+w nastêpuj¹cy sposób:
+$$ r_t = \left(\frac{\sigma\,W_t}{2} \right)^2, \quad \forall\,t\in [0,T],$$
+gdzie $W$ jest procesem Wienera przy mierze martynga³owej spot oraz $\sigma>0$.
+
+1. Wyznacz stochastyczne równanie ró¿niczkowe opisuj¹ce dynamikê chwilowej stopy procentowej.
+2. Jaki rozk³ad ma zmienna losowa $r_t$.
+
+## Model CIR - uproszczenie cz.2 {.smaller}
+
+**Rozwi¹zanie:** Z definicji wiemy, ¿e $r_t \ge 0$ dla dowolnego $t\in[0,T]$ $\mathbb{P}^\ast$-p.n.. 
+Na mocy wzoru Ito dla funkcji $f(x) = \frac{\sigma^2}{4}x^2$ mamy:
+
+$$
+\begin{align}
+dr_t & = 2\cdot\frac{\sigma^2}{4} W_t\,dW_t + \frac{1}{2}\cdot 2 \frac{\sigma^2}{4}\,dt
+\\ & = \frac{\sigma^2}{4}\,dt + \sigma\cdot \frac{\sigma}{2}|W_t|\cdot\sign{W_t}\,dW_t
+\\ & = \frac{\sigma^2}{4}\,dt + \sigma\cdot \sqrt{r_t}\cdot\sign{W_t}\,dW_t  
+\end{align}
+$$
+Wyka¿my, ¿e proces $B_\cdot = \int_0^\cdot{\sign{W_u}\,dW_u}$ jest ruchem Browna przy mierze martynga³owej $\mathbb{P}^\ast$. Z jednej z wersji twierdzenia Levy'ego wiemy, 
+¿e proces $B$ jest ruchem Browna je¿eli jest ci¹g³ym $\mathbb{P}$-martyga³em lokalnym o nawiasie
+skoœnym bêd¹cym procesem deterinistycznym równym $\langle B\rangle_t = t$.
+Ca³ka stochastyczna wzglêdem procesu Wienera jest martynga³em lokalnym. 
+Ponadto nawias skoœny procesu $B$ wynosi:
+$$\langle B\rangle_t = \int_0^t{(\sign{W_u})^2\,du} = t. $$
+
+
+## Model CIR - uproszczenie cz.3
+
+Oznacza to, ¿e $B$ jest ruchem Browna. St¹d proces $r$ spe³ania równanie:
+$$dr_t = \frac{\sigma^2}{4}\,dt + \sigma \sqrt{r_t}\,dB_t$$
+Jest to szczególny przypadek równania na proces CIR. Z definicji procesu $r$ wnioskujemy, ¿e zmienna losowa $r_t$ ma przeskalowany rozk³ad $\chi^2(1)$, poniewa¿:
+$$r_t = \left(\frac{\sigma\cdot W_t}{2}\right)^2 \stackrel{d}{=} \frac{\sigma^2\,t}{4}N^2,$$
+gdzie $N\sim\mathcal{N}(0,1)$, czyli $N^2\sim\chi^2(1)$. 
+
+
+## Mocel CIR - cena obligacji cz.1 {.smaller}
+
+W poprzednim przyk³adzie rozwa¿aliœmy uproszczon¹ wersjê modelu CIR. Teraz
+spróbujemy znaleŸæ cenê obligacji zerokuponowej w przypadku pe³nej wersji modelu.
+
+**Zadanie 2.** Niech $r$ bêdzie procesem chwilowej stopy procentowej zadanym stochastycznym równaniem ró¿niczkowym przy mierze martynga³owej $\mathbb{P}^\ast$:
+$$dr_t = a\left(b - r_t\right)\,dt + \sigma \sqrt{r_t}\,dW_t.\quad r_0 = r. $$
+ZnajdŸ cenê obligacji zerokuponowej na chwilê $t$.
+
+**Rozwi¹zanie:** Ustalmy zapadalnoœæ obligacji zerokuponowej na $T>0$. 
+Proces $r$ posiada w³asnoœæ Markowa, poniewa¿ dryf i czynnik dyfuzyjny s¹ funkcjami
+lokalnie lipschitzowskimi (ta w³asnoœæ wraz z dodatni¹ okreœlonoœci¹ czynnika dyfuzyjnego zapewnia w³asnoœæ Markowa). 
+Cena obligacji zerokuponowej zadana jest przez warunkow¹ wartoœæ oczekiwan¹:
+$$B(t,T) = \E\left(e^{-\int_t^T{r_u\,du}}\mid\Ff_t\right)= \E\left(e^{-\int_t^T{r_u\,du}}\mid r_t\right) = v(r_t,t), \quad \forall t\in[0,T]. $$
+
+## Mocel CIR - cena obligacji cz.2 {.smaller}
+
+Z twierdzenia Feynmana-Kaca (b¹dŸ z twierdzenia o strukturze) wiemy, ¿e powy¿sza warunkowa wartoœæ oczekiwana jest rozwi¹zaniem poni¿szego równania ró¿niczkowego cz¹stkowego (dok³adniej funkcja v):
+$$
+\left\{\begin{array}{lc} \frac{\partial }{\partial t}v(x,t) + a(b-x)\frac{\partial}{\partial x}v(x,t) + \frac{1}{2}\sigma^2x\frac{\partial^2}{\partial x^2}v(x,t) - x\,v(x,t) = 0 \\ v(x,T) = 1, \quad\forall x\in\R. \end{array} \right.
+$$
+
+Z drugiej jednak strony proces $r$ zadaje afiniczn¹ strukturê terminow¹, poniewa¿
+$\mu(t,x) = a\cdot(b-x)$ jest funkcj¹ afiniczn¹ oraz $\Sigma^2(t,x)=\sigma^2\cdot x$ jest równie¿ funkcj¹ afiniczn¹. 
+Zatem z twierdzenia o równowa¿ych warunkach na ATS wynika, ¿e mamy doczynienia z modelem ATS. St¹d istniej¹ funkcje deterministyczne $n, m$ takie, ¿e:
+$$B(t,T) =e^{m(t,T) - n(t,T)\cdot r_t}, \quad \forall t\in[0,T]. $$
+Podstawiaj¹c t¹ postaæ do równania ró¿niczkowego cz¹stkowego otrzymamy
+uk³ad równañ ró¿niczkowych zwyczajnych.
+
+## Mocel CIR - cena obligacji cz.3 {.smaller}
+
+Obliczmy w tym celu poszczególne pochodne cz¹stkowe:
+$$
+\begin{align}
+\frac{\partial }{\partial t}v(x,t) & = v(x,t)\left(m'(t,T) - n'(t,T) x \right),\\ 
+\frac{\partial}{\partial x}v(x,t) & =  - n(t,T)\,v(x,t)  ,\\
+\frac{\partial^2}{\partial x^2}v(x,t) & = n^2(t,T)\,v(x,t)
+\end{align} 
+$$
+
+Podstawiaj¹c powy¿sze wartoœci do r.r.cz. otrzymamy:
+
+$$
+\left\{\begin{array}{lc} 
+v(x,t)\cdot\left(m'(t,T) - n'(t,T)\cdot x  - a(b-x) n(t,T) + \frac{1}{2}\sigma^2x\,n^2(t,T) - x\right) = 0 \\ 
+v(x,T) = 1, \quad\forall x\in\R. 
+\end{array} \right.
+$$
+
+## Mocel CIR - cena obligacji cz.4 {.smaller}
+
+Grupuj¹c wyrazy przy $x$ oraz $1$ otrzymujemy (z liniowej niezale¿noœci i œcis³ej dodatnioœci $v$), ¿e funkcja $m, n$ spe³niaj¹ nastêpuj¹cy uk³ad równañ ró¿niczkowych cz¹stkowych:
+
+$$
+\left\{\begin{array}{ll} 
+0 = m'(t,T) - a\, b\, n(t,T), & m(T,T) = 0 \\
+0 = -n'(t,T)  + a n(t,T) + \frac{1}{2}\sigma^2n^2(t,T) - 1, & n(T,T) = 0 
+\end{array} \right.
+$$
+
+Rozwi¹¿my ten uk³ad r.r.z. Zauwa¿my, ¿e znaj¹c funkcjê $n$ bêdziemy w stanie w ³atwy sposób odzyskaæ postaæ funkcji $m$ po przez przeca³kowanie pierwszego równania, tzn.:
+$$a\, b\, \int_t^T{n(u,T)\,du} = \int_t^T{m'(u,T)\,du} = m(T,T)-m(t,T) = -m(t,T).$$
+Zajmijmy siê zatem drugim równaniem.
+
+## Mocel CIR - cena obligacji cz.5 {.smaller}
+
+Drugie równanie jest równaniem Ricattiego. Dla takiego równania wystarczy znaleŸæ jedno szczególne rozwi¹zanie r.r.z, by nastêpnie odzyskaæ rozwi¹zanie ogólne r.r.z.
+Jednym z rozwi¹zañ szczególnych jest rozwi¹zanie sta³e $n^*\equiv c$, gdzie $c$ jest rozwi¹zaniem równania kwadratowego:
+$$a c + \frac{1}{2}\sigma^2c^2(t,T) - 1=0,$$
+czyli $c = \frac{-a\pm \gamma }{\sigma^2}$, gdzie $\gamma:= \sqrt{a^2+2\sigma^2}$.
+Wybierzmy rozwi¹zanie dodatnie, czyli $c= \frac{\gamma - a}{\sigma^2}$. Znalezienie
+rozwi¹zania szczególnego sprowadza równanie Ricattiego do równania Bernoulliego
+po przez zadanie $n(t,T) = n^*(t,T) + \frac{1}{k(t)}$. Funkcja $k$ spe³nia równanie:
+$$k'(t) + (a + \sigma^2\,n^*(t,T)) k(t) = -\frac{\sigma^2}{2}, $$
+co po rozwiniêciu daje:
+
+$$k'(t) + \gamma\, k(t) = \frac{\sigma^2}{2} \Leftrightarrow \frac{k'(t)}{k(t)+\frac{\sigma^2}{2\gamma}} = -\gamma $$
+
+## Mocel CIR - cena obligacji cz.6 {.smaller}
+
+Funkcja $k$ przyjmuje wiêc postaæ:
+
+$$k(t) = A\,e^{-\gamma\,t} - \frac{\sigma^2}{2\gamma},\quad \textrm{gdzie } A<0.$$
+
+Warunek koñcowy wymusza zale¿noœæ:
+$$0 = n(T,T) = \frac{\gamma - a}{\sigma^2} + \frac{2\gamma e^{\gamma T}}{2\gamma\,A - \sigma^2 e^{\gamma T}}$$
+Przekszta³caj¹c obie strony równania dostajemy:
+
+$$A =\frac{\sigma^2}{2\gamma}\,e^{\gamma\, T} + \frac{\sigma^2\,e^{\gamma\, T}}{a-\gamma} =\sigma^2\,e^{\gamma\, T}\frac{a+\gamma}{2\gamma(a-\gamma)}=-e^{\gamma\, T}\frac{(a+\gamma)^2}{4\gamma} $$
+
+## Mocel CIR - cena obligacji cz.7 {.smaller}
+
+Ostatecznie funkcja $n$ przyjmuje postaæ:
+$$
+\begin{align}
+n(t,T) & = \frac{\gamma - a}{\sigma^2} - \frac{2\gamma \, e^{\gamma\,t}}{\frac{(\gamma + a)^2}{2}\,e^{\gamma\,T} + \sigma^2\,e^{\gamma\,t}} =  \frac{\gamma - a}{\sigma^2} - \frac{2\gamma \, e^{-\gamma\,(T-t)}}{\frac{(\gamma + a)^2}{2} + \sigma^2\,e^{-\gamma\,(T-t)}} \\
+ & = \frac{(\gamma+a)\sigma^2 + (\gamma-a)\,\sigma^2\,e^{-\gamma\,(T-t)}-2\gamma\sigma^2\,e^{-\gamma\,(T-t)}}{\sigma^2\left(\frac{(\gamma + a)^2}{2} + \sigma^2\,e^{-\gamma\,(T-t)}\right)} = \\
+ & = \frac{(\gamma + a)\left(1-\,e^{-\gamma\,(T-t)}\right)}{\frac{(\gamma + a)^2}{2} + \sigma^2\,e^{-\gamma\,(T-t)}} = \frac{2\left(1-\,e^{-\gamma\,(T-t)}\right)}{(\gamma + a) + (\gamma-a)\,e^{-\gamma\,(T-t)}} \\
+ & = \frac{2\left(e^{\gamma\,(T-t)}-1\right)}{(\gamma+a)\left(e^{\gamma\,(T-t)}-1\right) + 2\gamma}
+\end{align}
+$$
+podczas gdy funkcja $m$ zadana jest wzorem:
+$$m(t,T) = \frac{2\,a\,b}{\sigma^2}\ln\left(\frac{2\gamma e^{(\gamma+a)(T-t)/2}}{(\gamma+a)\left(e^{\gamma\,(T-t)}-1\right) + 2\gamma}\right).$$
+
+## Model CIR - równanie na funkcjê przejœcia  cz.1 {.smaller}
+
+**Zadanie 3.** ZnajdŸ równanie ró¿niczkowe cz¹stkowe opisuj¹ce gêstoœæ prawdopodobieñstwa przejœcia procesu $r$ w modelu CIR.
+
+**Rozwi¹zanie:** Oznaczmy przez $P$ funkcjê prawdopodobieñstw przejœcia procesu $r$,
+tzn. 
+$$ P(r,s,B,t) = \P^\ast(r_t\in B\mid r_s=r),\quad \forall t\ge s\ge 0\ \forall r\ge0 \ \forall B\in\mathcal{B}(\R_+)$$
+i niech $p$ bêdziê funkcj¹ gêstoœci. Wiemy, ¿e dla procesu Ito $X$ opisanym stochastycznym równaniem ró¿niczkowym:
+$$dX_t = \mu(X_t)\,dt + \Sigma(X_t)\, dW_t$$
+funkcja $p$ spe³nia równanie ró¿niczkowe cz¹stkowe Fokkera-Plancka (zwane równie¿ progresywnym równaniem Ko³mogorowa):
+$$\frac{\partial}{\partial t}p(x,t) + \frac{\partial}{\partial x}\left(\mu(x)\,p(x,t)\right) - \frac{\partial^2}{\partial x^2}\left(\frac{\Sigma^2(x)}{2}p(x,t)\right) = 0. $$
+
+## Model CIR - równanie na funkcjê przejœcia  cz.2 {.smaller}
+
+Podstawiaj¹c do równania wspó³czynnik dryfu i dyfuzji z modelu CIR otrzymujemy:
+$$\frac{\partial}{\partial t}p(x,t) + \left(a(b-x) -\sigma^2\right)\frac{\partial}{\partial x}p(x,t) - \frac{\sigma^2}{2} x\, \frac{\partial^2}{\partial x^2}p(x,t) = 0$$
+
+## Model CIR - równanie na funkcjê przejœcia  cz.3 {.smaller}
+
+**Zadanie dodatkowe 4 (2 Pkt).** Udowodnij, ¿e funkcja $p$ z poprzedniego zadania
+zadana jest wzorem:
+$$p(x,t;y,s) = c\, e^{-u-v \,\left(\frac{u}{v} \right)^{q/2}} I_q\left(2\sqrt{u\,v}\right),  $$
+gdzie 
+$$ 
+\begin{align}
+c & = \frac{2 a}{\sigma^2\left(1-e^{-a(t-s)}\right)}, \\
+u & = c\,x\,e^{-a(t-s)}, \\
+v & = c \, y,\\
+q & = \frac{2\,a\,b}{\sigma^2}-1,\\
+I_q(z) & = \left(\frac{z}{2}\right)^q\,\sum_{k=0}^\infty{\frac{(z^2/4)^k}{k!\,\Gamma(q+k+1)}} 
+\end{align}.
+$$
+
+## Wycena opcji na obligacje cz.1 {.smaller}
+
+**Zadanie 5.** Rozwa¿my model o afinicznej strukturze terminowej. ZnajdŸ cenê
+opcji call o zapadalnoœci $T$ na obligacjê zerokuponow¹ o zapadalnoœci $U>T$.
+W zadaniu za³ó¿, ¿e krzywa dyskontowa jest taka sama jak krzywa projekcyjna (
+do dyskontowania u¿ywamy krzywej odzyskanej z obligacji).
+
+**Rozwi¹zanie:** Wyp³ata w opcji call na obligacjê wynosi:
+$$X=(B(T,U) - K)^+ = (B(T,U) - K) \mathbb{I}_D , $$
+gdzie $K>0$ oraz $D = \left\{B(T,U) > K \right\}$. Z klasycznej teorii wyceny
+dostajemy, ¿e
+$$
+\small
+\begin{align}
+\pi_t(X) & = B_t \E_{\P^\ast}\left(\frac{1}{B_T}(B(T,U)-K)\mathbb{I}_D\mid\Ff_t\right) \\
+& = 
+B_t\,\E_{\P^\ast}\left(\E_{\P^\ast}\left(\frac{\mathbb{I}_D}{B_U}\mid\Ff_T\right)\mid\Ff_t\right) - K\, B_t\,B(0,T)\E_{\P^\ast}\left(\frac{\mathbb{I}_D}{B_T\,B(0,T)}\mid\Ff_t\right) \\
+& = B_t\,B(0,U)\E_{\P^\ast}\left(\frac{\mathbb{I}_D}{B(0,U)\,B_U}\mid\Ff_t\right) - K\, B_t\,B(0,T)\E_{\P^\ast}\left(\frac{\mathbb{I}_D}{B_T\,B(0,T)}\mid\Ff_t\right)\\
+& = B(t,U)\P_{U}(D\mid\Ff_t) - K\,B(t,T)\P_{T}(D\mid\Ff_t)
+\end{align}
+$$
+
+## Wycena opcji na obligacje cz.2 {.smaller}
+
+Za³o¿yliœmy, ¿e nasz model zadaje afiniczn¹ strukturê terminow¹, co oznacza,
+¿e 
+$$D = \left\{B(T,U) > K\right\} =  \left\{e^{m(T,U)-n(T,U)\,r_T} > K\right\} = \left\{\frac{m(T,U)-\ln{K}}{n(T,U)} > r_T\right\},$$
+zatem wzór na opcjê na obligacjê przyjmuje postaæ:
+$$\pi_t(X) = B(t,U)\,F_{U}(K^\ast(T,U)\mid\Ff_t) - K\,B(t,T)\,F_{T}(K^\ast(T,U)\mid\Ff_t),$$
+gdzie $F_U,F_T$ s¹ dystrybuantami (warunkowymi) zmiennej losowej $r_T$ (wzglêdem $\sigma$-cia³a $\Ff_t$) odpowiednio przy mierze $\P_U, \P_T$ oraz 
+$$K^\ast(U,T) = \frac{m(T,U)-\ln{K}}{n(T,U)}.$$
+
+Wzór ten nieco przypomina wzór Blacka-Scholesa. Czy dystrybuanty warunkowe da siê wyznaczyæ w ³atwy sposób w przypadku modelu Vasicka b¹dŸ modelu CIR?
+Zadanie nie nale¿y do naj³atwiejszych.
+
+## Wycena opcji na obligacje cz.3 {.smaller}
+
+**Zadanie dodatkowe 6. (2 x 2 Pkt). ** Wyznacz dystrybuanty $F_{T}(K^\ast(T,U)\mid r_t)$ oraz $F_{U}(K^\ast(T,U)\mid r_t)$ dla jednego z modeli:
+
+1. Modelu Vasicka.
+2. Modelu CIR.
+
+*Wskazówka.* Na pocz¹tku znajdŸ (warunkow¹) transformatê Laplace'a wektora losowego 
+$$\left(\int_t^T{r_u\,du}, r_T\right) {\huge\vert} r_t = r$$
+
+## Dynamika $r$ przy mierze $\P_T$ cz.1 {.smaller}
+
+**Zadanie 7.** ZnajdŸ dynamikê chwilowej stopy procentowej przy mierze $\P_T$ dla modelu z afiniczn¹ struktur¹ terminow¹. Czy zamiana miary zachowuje afiniczn¹ strukturê terminow¹?
+
+**Rozwi¹zanie:** Na æwiczeniach poznaliœmy technikê zamiany miary. Tezy zadañ z listy 2 wykorzystamy do rozwi¹zania tego zadania. Wiemy, ¿e gêstoœæ Radona-Nikodyma miary
+$\P_T$ wzglêdem miary $\P^\ast$ wynosi:
+$$\frac{d\P_T}{d\P^\ast} = \frac{1}{B(0,T)\,B_T}$$
+oraz
+$$\eta_t=\frac{d\P_T}{d\P^\ast}{\huge\vert}_{\Ff_t} = \frac{B(t,T)}{B(0,T)\,B_t}.$$
+Korzystaj¹c z wzoru Ito praw¹ stronê równania mo¿emy przedstawiæ jako:
+$$\frac{B(t,T)}{B(0,T)\,B_t} = \int_0^t{\ldots\,dt } - \int_0^t{\frac{B(t,T)}{B(0,T)\,B_t}\,n(u,T)\sigma(r_u,u)\,dW_u^\ast}, $$
+gdzie pierwsza ca³ka jest równa $0$, poniewa¿ proces $\eta$ jest $\P^\ast$-martynga³em. 
+
+## Dynamika $r$ przy mierze $\P_T$ cz.2 {.smaller}
+
+Z twierdzenia Girsanowa dostajemy, ¿e
+$$W^T_t = W_t^\ast + \int_0^t{n(u,T)\sigma(r_u,u)\,du}$$
+zatem SDE przy mierze $\P_T$ na chwilow¹ stopê procentow¹ przedstawia siê w nastêpuj¹cy sposób:
+$$dr_t = \left(\mu(r_t,t) - \sigma^2(r_t,t)\cdot n(t,T)\right)\,dt + \sigma(r_t,t)\,dW^T_t.$$
+
+Zauwa¿my, ¿e funkcja $\mu$ oraz $\sigma^2$ s¹ funkcjami afinicznymi, zatem z twierdzenia zadaj¹cego równowa¿ne warunki na afiniczn¹ strukturê terminow¹ wnioskujemy, ¿e zamiana miary na miarê forward nie zmiania w³asnoœci afinicznej struktury terminowej.
