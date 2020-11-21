@@ -1,0 +1,199 @@
+---
+title: "Parametryczne modele struktury terminowej"
+author: "Adam Pytel"
+date: "11 listopada 2020"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Wstêp
+
+Poznane dotychczas modele chwilowej stopy procentowej umo¿liwiaj¹ symulacjê
+przyszy³ych stóp procentowych. Elementy w nie wbudowane takie jak powrót 
+do œredniej, czy wygasaj¹ca zmiennoœæ cen obligacji, a tak¿e zale¿nosæ zmiennoœci
+chwilowej stopy procentowej od poziomu tych stóp oparte s¹ na podwalinach
+ekonomicznych, ale te¿ na obserwacjach historycznych. W literaturze mo¿na znaleŸæ
+ przyk³ady, które podwa¿aj¹ niektóre z tych za³o¿eñ b¹dŸ przeciwnie, potwierdzaj¹ s³usznoœæ za³o¿eñ.
+ 
+Pomijaj¹c w tym momencie zasadnoœæ takich b¹dŸ innych za³o¿eñ, na dzisiejszych
+æwiczeniach przyjrzymy siê w jaki sposób dane za³o¿enia maj¹ prze³o¿enie na
+pocz¹tkow¹ strukturê terminow¹. Nasze rozwa¿ania skupimy na krzywej zerokuponowej
+i krzywej forwardowej.
+
+## Model Vasicka cz. 1 {.smaller}
+
+Przypomnijmy, ¿e w modelu Vasicka zadanym stochastycznym równaniem ró¿niczkowym
+$$dr_t = a(\mu - r_t)\,dt + \sigma\,dW_t$$
+cena obligacji zerokuponowej o zapadalnoœci $T$ w chwili $0$ wynosi:
+$$B(0,T) = e^{m(0,T)-n(0,T)\cdot r_0 }$$ 
+gdzie
+$$ 
+\begin{align}
+  n(t,T) & = \frac{1}{a}\left(1-e^{-a(T-t)}\right) ,\\
+  m(t,T) & = \left(a^2\,b - \frac{\sigma^2}{2}\right)\frac{n(t,T)- (T-t)}{a^2} - \frac{\sigma^2\,n^2(t,T)}{4\,a} 
+\end{align}
+$$
+dla wszystkich $0\le t\le T\le T^\ast$. Z powy¿szych wzorów wnioskujemy, ¿e
+pocz¹tkowa struktura terminowa zadana jest wzorami:
+
+## Model Vasicka cz. 2 {.smaller}
+
+$$
+Y(0,T) = \frac{1-e^{-a\,T}}{a\,T}\,r_0 + \frac{\sigma^2\,n^2(0,T)}{4\,a\,T} + \left(b - \frac{\sigma^2}{2\,a^2}\right)\cdot \left( 1 -\frac{1-e^{-a\,T}}{a\,T}  \right)
+$$
+Z tej postaci widzimy, ¿e
+$$
+\begin{align}
+\lim_{T\to 0^+}Y(0,T) & = r_0,\\
+\lim_{T\to +\infty}Y(0,T) & = b-\frac{\sigma^2}{2\,a^2} =: Y(0,\infty)
+\end{align}
+$$
+
+zatem krzyw¹ zerokuponow¹ mo¿na wyraziæ w nastêpuj¹cej postaci:
+$$Y(0,T) = Y(0,\infty)+\frac{n(0,T)}{T}\,\left(r_0 - Y(0,\infty)\right) + \frac{\sigma^2\,n^2(0,T)}{4\,a\,T}, \quad\forall\, T\ge0. $$
+Z powy¿szej postaci wynika, ze krzywa terminowa jest rosn¹ca je¿eli $r_0 < Y(0,\infty)-\frac{\sigma^2}{4a^2}$ i malej¹ca je¿eli $r_0 > Y(0,\infty)+\frac{\sigma^2}{4a^2}$. W pozosta³ych przypadku posiada ekstrema (*garb*).
+
+## Model Vasicka cz. 3 {.smaller}
+
+W modelu Vasicka pocz¹tkowa krzywa forwardowa wynosi:
+$$\frac{d}{dT}(T\,Y(0,T)) = Y(0,\infty) + (r_0-Y(0,\infty))\,e^{-a\,T} + \frac{\sigma^2}{2a}n(0,T)\,e^{-a\,T} $$
+
+## Model Vasicka cz.4 {.smaller}
+
+```{r vasicek-zc}
+n <- function(t, a){(1-exp(-a*t))/a}
+zc_vasicek <- function(t, a, sigma, r_0, mu){
+  mu + n(t,a)/t * (r_0-mu) + sigma^2*n(t,a)^2/(4*a*t)
+}
+```
+Poni¿ej przedstawione zosta³y wykresy dla ró¿nych parametryzacji
+
+```{r, fig.align='center', fig.height=5}
+par(mfrow=c(2,2))
+curve(zc_vasicek(x,0.16, 0.015, 0.01,0.03),0.0001,30, xlab = "Maturity",ylab="Rate",
+      main=bquote(r[0]=="1%,"~mu=="3%,"~sigma=="1.5%,"~a==0.16),col="orange",lwd=2)
+curve(zc_vasicek(x,0.16, 0.005, 0.015,0.01),0.0001,30, xlab = "Maturity",ylab="Rate",
+      main=bquote(r[0]=="1.5%,"~mu=="1%,"~sigma=="0.5%,"~a==0.16),col="orange",lwd=2)
+curve(zc_vasicek(x,0.2, 0.015, 0.011,0.01),0.0001,30, xlab = "Maturity",ylab="Rate",
+      main=bquote(r[0]=="1.1%,"~mu=="1%,"~sigma=="1.5%,"~a==0.2),col="orange",lwd=2)
+par(mfrow=c(1,1))
+
+```
+
+## Model CIR
+
+Dla modelu CIR mo¿na dokonaæ podobnej analizy. Przypomnijmy, ¿e model CIR zadany jest
+stochastycznym równaniem ró¿niczkowym
+$$dr_t = a(b-r_t)\,dt + \sigma\sqrt{r_t}\,dW_t$$
+**Zadanie 1.** Rozpatrzmy model CIR. ZnajdŸ wzór na stopy zerokuponowe w jêzyku $r_0$ oraz $Y(0,\infty)$, a tak¿e krzyw¹ forwadow¹.
+
+## Model Nelsona-Siegel cz.1 {.smaller}
+
+Czêœæ bankór centralych u¿ywa³a b¹dŸ na nadal u¿ywa dwóch modeli parametrycznych
+do opisu krzywych terminowych: modelu Nelsona-Siegela oraz Svenssona.
+
+**Zadanie 2** W modelu Nelsona-Siegela krzywa forwardowa ma nastêpuj¹c¹ postaæ:
+$$f(0,t) = \beta_0 + \beta_1 \, e^{-t/\lambda} + \beta_2\, \frac{t}{\lambda}\, e^{-t/\lambda}, \quad\forall\,t\ge 0 $$
+WyprowadŸ wzór na stopê zerokuponow¹ i zinterpretuj poszczególne parametry w tym modelu.
+
+**Rozwi¹zanie:** Wiemy, ¿e krzyw¹ forwardow¹ oraz krzyw¹ zerokuponow¹ ³¹czy zale¿noœæ:
+$$Y(t,T) = \frac{1}{T-t}\int_t^T{f(t,u)\,du},\quad \forall \,0\le t\le T $$
+
+## Model Nelsona-Siegel cz.2 {.smaller}
+
+Model Nelsona-Siegela jest modelem pocz¹tkowej struktury terminowej, wiêc
+w tym przypadku obliczamy $Y(0,T)$:
+$$Y(0,t) = \beta_0 + \beta_1\cdot\left(\frac{1-e^{-t/\lambda}}{t/\lambda}\right) + \beta_2\cdot\left(\frac{1-e^{-t/\lambda}}{t/\lambda} - e^{-t/\lambda}\right),\quad\forall\,t\ge 0$$
+
+Pierwszy parametr $\beta_0$ odpowiada za stopê d³ugoterminow¹, z kolei $\beta_1$
+odpowiada za nachylenie krzywej, bo wartoœæ $\beta_0+\beta_1$ jest stop¹ zerokuponow¹ z krótkiego koñca. Wreszcie parametr $\beta_2$ odpowiada za wystêpowanie "garbów" na krzywej czyli kszta³tu. Parametr $\lambda$ odpowiada za szybkoœæ wygasania poszczególnych efektów (nachylenia, po³o¿enie przegiêcia). 
+
+**Uwaga:** Ekonometryczny (prognostyczny) model dynamiki krzywych zerokuponowych nazywa siê modelem Diebold-Li i opiera siê na modelu Nelsona-Siegela oraz procesach AR.
+
+
+## Model Svenssona
+
+**Zadanie 3** W modelu Svenssona krzywa forwardowa ma nastêpuj¹c¹ postaæ:
+$$f(0,t) = \beta_0 + \beta_1 \, e^{-t/\lambda_1} + \beta_2\, \frac{t}{\lambda_1}\, e^{-t/\lambda_1} + \beta_3\, \frac{t}{\lambda_2}\, e^{-t/\lambda_2}, \quad\forall\,t\ge 0, $$
+dla ka¿dego $t\ge 0$, gdzie $\lambda_2>\lambda_1$ oraz $\beta_0,\beta_1,\beta_2,\beta_3 \in\mathbb{R}$. WyprowadŸ wzór na stopê zerokuponow¹ i zinterpretuj poszczególne parametry w tym modelu.
+
+## Model Hull'a-White'a cz. 1 {.smaller}
+
+S³aboœci¹ modeli pierwszej generacji by³y problemy z dopasowaniem siê do pocz¹tkowej
+struktury terminowej. Nie wszystkie obserwowane kszta³ty krzywych da³y siê odzwierciedliæ przy pomocy znanych modeli. Prace Ho, Lee oraz Hull'a-White'a
+zapocz¹tkowa³y nowy trend dopasowywania bezpoœrednio do danych rynkowych. Druga
+generacja modeli stopy procentowej skupi³a siê dopasowaniu pocz¹tkowej struktury terminowej po przez modyfikacjê istniej¹cych modeli wyceny.
+
+Hull i White zaproponowali nastêpuj¹c¹ postaæ modelu chwilowej stopy procentowej:
+$$dr_t = \left(\theta(t) - a(t)\,r_t\right) \,dt + \sigma(t)\,r^\beta(t)\,dW_t, $$
+gdzie $\beta\ge 0$ oraz $\theta,a,\sigma$ s¹ odpowiednio g³adkimi funkcjami dla których powy¿sze SDE ma rozwi¹zanie. Dla $\beta=0$ otrzymujemy uogólniony model Vasicka,
+a dla $\beta=\frac{1}{2}$ dostajemy uogólniony model CIR. 
+
+## Model Hull'a-White'a cz. 2 {.smaller}
+
+**Zadanie 4.** Rozwa¿my uogólniony model Vasicka, gdzie funkcja $a,\sigma$ s¹ sta³e.
+
+1. ZnajdŸ cenê obligacji zerokuponowej.
+2. Dopasuj model do obserwowanej struktury terminowej $\hat{B}(0,\cdot)$.
+
+**Rozwi¹zanie:** Tak jak na poprzednich zajêciach dowodzimy, ¿e model jest ATS,
+korzystamy z twierdzenia Feynmana-Kaca wycenê sprowadzamy do rozwi¹zania równania
+ró¿niczkowego cz¹stkowego. Korzystaj¹c z w³asnoœci ATS rozbijamy nasz problem
+na uk³ad równañ ró¿niczkowych zwyczajnych dostaj¹c:
+
+$$
+\left\{\begin{array}{ll} 
+0 = m'(t,T) - \theta(t)\, n(t,T) + \frac{\sigma^2}{2}\,n^2(t,T), & m(T,T) = 0 \\
+0 = -n'(t,T)  + a n(t,T) - 1, & n(T,T) = 0 
+\end{array} \right.
+$$
+Rozwi¹zaniem powy¿szego uk³adu równañ jest:
+$$
+\begin{align}
+n(t,T) & = \frac{1-e^{-a\,(T-t)}}{a},\\
+m(t,T) & = \frac{\sigma^2}{2}\int_t^T{\,n^2(u,T)\,du} - \int_t^T{\theta(u)\, n(u,T)\,du}
+\end{align}
+$$
+
+## Model Hull'a-White'a cz. 3 {.smaller}
+
+Obserwowana struktura terminowa $\hat{B}(0,\cdot)$ zadana jest w dyskretnych punktach czasu. Korzystaj¹c z jednego z modeli parametrycznych b¹dŸ nieparametrycznych
+odzyskujemy strukturê terminow¹ we wszystkich punktach $[0,T^\ast]$. Zak³adaj¹c odpowiedni¹ g³adnoœæ krzywej krzyw¹ dyskontow¹ $\hat{B}(0,\cdot)$ mo¿emy przekszta³ciæ w krzyw¹ forwardow¹ $\hat{f}(0,\cdot)$ za pomoc¹ przekszta³cenia:
+$$\hat{f}(0,T) = -\frac{\partial}{\partial T}\ln{\hat{B}(0,T)}. $$
+Z drugiej jednak strony wiemy, ¿e
+$$
+\begin{align}
+f(0,T) & = -\frac{\partial}{\partial T}\ln{B(0,T)} = \frac{\partial}{\partial T}n(0,T)\,r_0 - \frac{\partial}{\partial T}m(0,T) \\
+& = \frac{\partial}{\partial T}n(0,T)\,r_0 - \frac{\sigma^2}{2}\frac{\partial}{\partial T}\int_0^T{\,n^2(u,T)\,du} + \frac{\partial}{\partial T}\int_0^T{\theta(u)\, n(u,T)\,du}
+\end{align}
+$$
+
+## Model Hull'a-White'a cz. 4 {.smaller}
+
+Korzystaj¹c z g³adnoœci, wzoru na pochodnê dwóch zmiennych:
+$$\frac{d}{dt}F(t,t) = F'_x(t,t) + F'_y(t,t) $$
+oraz twierdzenia o wejœciu pochodnej pod znak ca³ki otrzymujemy
+$$
+\begin{align}
+f(0,T) & = \frac{\partial}{\partial T}n(0,T)\,r_0 - \frac{\sigma^2}{2}\left(n^2(T,T) +2\int_0^T{e^{-a(T-u)}\,n(u,T)\,du}\right) \\
+ & \ \ \ + \theta(T)n(T,T) + \int_0^T{\theta(u)\, e^{-a(T-u)}\,du}
+\end{align}
+$$
+Oznaczmy przez $g$ funkcjê zadan¹ wzorem
+$$g(T) = r_0\,e^{-a\,T}-\sigma^2\int_0^T{e^{-a(T-u)}\,n(u,T)\,du}$$
+Dopasowanie struktury terminowej oznacza, ¿e
+$$f(0,T) = \hat{f}(0,T).$$
+
+## Model Hull'a-White'a cz. 5 {.smaller}
+
+Nak³adaj¹c dodatkowy warunek g³adkoœci na $\hat{f}$ otrzymujemy równanie:
+$$\hat{f}(0,T)-g(T) = \int_0^T{\theta(u)\, e^{-a(T-u)}\,du} $$
+Przemna¿aj¹æ obie strony równania przez $e^{a\,T}$ i
+ó¿niczkuj¹c obie strony równania otrzymujemy:
+$$\theta(T) \,e^{aT} = \left(a(\hat{f}(0,T)-g(T))+\frac{\partial}{\partial T}\hat{f}(0,T)-\frac{d}{dT}g(T)\right)\,e^{aT},$$
+co ostatecznie daje postaæ funkcji $\theta$:
+$$\theta(T) = a(\hat{f}(0,T)-g(T))+\frac{\partial}{\partial T}\hat{f}(0,T)-\frac{d}{dT}g(T). $$
+**Uwaga:** Powy¿sze podejœcie wyklucza modele pocz¹tkowej struktury terminowej z nieg³adk¹ krzyw¹ forwardow¹ (zazwyczaj chcemy mieæ g³adk¹).

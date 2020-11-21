@@ -275,15 +275,74 @@ $\P_T$ wzglêdem miary $\P^\ast$ wynosi:
 $$\frac{d\P_T}{d\P^\ast} = \frac{1}{B(0,T)\,B_T}$$
 oraz
 $$\eta_t=\frac{d\P_T}{d\P^\ast}{\huge\vert}_{\Ff_t} = \frac{B(t,T)}{B(0,T)\,B_t}.$$
-Korzystaj¹c z wzoru Ito praw¹ stronê równania mo¿emy przedstawiæ jako:
-$$\frac{B(t,T)}{B(0,T)\,B_t} = \int_0^t{\ldots\,dt } - \int_0^t{\frac{B(t,T)}{B(0,T)\,B_t}\,n(u,T)\sigma(r_u,u)\,dW_u^\ast}, $$
-gdzie pierwsza ca³ka jest równa $0$, poniewa¿ proces $\eta$ jest $\P^\ast$-martynga³em. 
 
 ## Dynamika $r$ przy mierze $\P_T$ cz.2 {.smaller}
 
-Z twierdzenia Girsanowa dostajemy, ¿e
+Korzystaj¹c z wzoru Ito praw¹ stronê równania mo¿emy przedstawiæ jako:
+$$\frac{B(t,T)}{B(0,T)\,B_t} = \int_0^t{\ldots\,dt } - \int_0^t{\frac{B(u,T)}{B(0,T)\,B_u}\,n(u,T)\sigma(r_u,u)\,dW_u^\ast}, $$
+gdzie pierwsza ca³ka jest równa $0$, poniewa¿ proces $\eta$ jest $\P^\ast$-martynga³em. 
+
+## Dynamika $r$ przy mierze $\P_T$ cz.3 {.smaller}
+
+Bezpoœrednio z twierdzenia Girsanowa dostajemy, ¿e
 $$W^T_t = W_t^\ast + \int_0^t{n(u,T)\sigma(r_u,u)\,du}$$
 zatem SDE przy mierze $\P_T$ na chwilow¹ stopê procentow¹ przedstawia siê w nastêpuj¹cy sposób:
 $$dr_t = \left(\mu(r_t,t) - \sigma^2(r_t,t)\cdot n(t,T)\right)\,dt + \sigma(r_t,t)\,dW^T_t.$$
 
 Zauwa¿my, ¿e funkcja $\mu$ oraz $\sigma^2$ s¹ funkcjami afinicznymi, zatem z twierdzenia zadaj¹cego równowa¿ne warunki na afiniczn¹ strukturê terminow¹ wnioskujemy, ¿e zamiana miary na miarê forward nie zmiania w³asnoœci afinicznej struktury terminowej.
+
+## Dlaczego model jednoczynnikowy? {.smaller}
+
+**Zadanie 8.** Rozwa¿my model chwilowej stopy procentowej z afiniczn¹ struktur¹
+terminow¹. Wyka¿, ¿e zmiany na krzywej terminowej dla ró¿nych tenorów s¹ równoleg³e (z dok³adnoœci¹ do znaku).
+Czy to oznacza, ¿e zmiany s¹ perfekcyjnie liniowo skorelowane, tzn. korelacja Pearsona jest równa 1?
+
+**Rozwi¹zanie:** WprowadŸmy oznaczenie $\tau := T-t$. Wtedy cenê obligacji zerokuponowej dla modelu ATS mo¿emy zapisaæ:
+$$B(t,T) = e^{\tilde{m}(t,t+\tau) - \tilde{n}(t,t+\tau)\,r_t}, \quad \forall\,0\le t\le T \le T^\ast$$
+dla pewnych funkcji $\tilde{m}$ oraz $\tilde{n}$. 
+Definiujemy funkcje 
+$$m(\cdot,\tau):=\tilde{m}(\cdot, \cdot+\tau),\quad n(\cdot,\tau):=\tilde{n}(\cdot, \cdot+\tau),\quad\forall \tau\ge 0$$
+
+## Dlaczego model jednoczynnikowy? cz.2 {.smaller}
+
+Cenê obligacji zerokuponowej $B$ mo¿emy wyraziæ przez stopy 
+zerokuponowe $Y$:
+$$B(t,T) = e^{-Y(t,\tau)\,\tau}, \quad \forall\,0\le t\le T^\ast \wedge\forall \tau\in[0,T^\ast-t].$$
+Oznacza to, ¿e 
+$$Y(t,\tau) = \frac{n(t,\tau)}{\tau}\,r_t - \frac{m(t,\tau)}{\tau}, \quad \forall\,0\le t\le T^\ast \wedge\forall \tau\in[0,T^\ast-t]. $$
+Zatem zmiany w jednym czynniku stochastycznym s¹ równoleg³e, choæ niekoniecznie maj¹ ten sam znak, bo funkcja $n$ dla ró¿nych terminów zapadalnoœci mo¿e przyjmowaæ wartoœci dodatnie b¹dŸ ujemne.
+
+<div class="notes">
+Czy funkcja $n$ jest zawsze tego samego znaku?
+</div>
+
+## Korelacje dla ATS cz.1 {.smaller}
+
+SprawdŸmy nastêpnie korelacjê liniow¹. Nale¿y zatem sprawdziæ czy zmiany na krzywej zerokuponowej dla ró¿nych $\tau_1$ i $\tau_2$ s¹ ze sob¹ perfekcyjnie skorelowane.
+Oznaczmy przez $Z(t,\Delta, T)$ zmianê w ci¹gu czasu $\Delta$ na tenorze $T=t+\tau$, tzn.
+$$Z_t(\Delta,T) = Y(t+\Delta,\tau) - Y(t,\tau).$$
+Z twierdzenia Cauchy'ego-Schwarz'a wynika, ¿e zmienne losowe $Z(t,\Delta,\tau_1)$
+i $Z(t,\Delta,\tau_2)$ s¹ perfekcyjnie skorelowane je¿eli istnieje sta³a $a\neq 0$ oraz $b\in\R$ takie, ¿e
+$$Z(t,\Delta,\tau_1) = a\,Z(t,\Delta,\tau_2)+b.$$
+Sta³e te zale¿¹ od $t,\Delta,\tau_1, \tau_2$. Podstawiaj¹æ $Y$ do powy¿szego warunku mamy:
+$$Y(t+\Delta,\tau_1) - a\,Y(t+\Delta,\tau_2) = Y(t,\tau_1) - a\,Y(t,\tau_2) + b, $$
+co przy uwzglêdnieniu zale¿noœci pomiêdzy $Y$, a $n,m, r$ daje:
+$$\small\left(n(t+\Delta,\tau_1) - a\,n(t+\Delta,\tau_2)\right)\,r_{t+\Delta} = \left(n(t,\tau_1) - a\,n(t,\tau_2)\right)\,r_t + \tilde{b}(t,\Delta,\tau_1,\tau_2) $$
+
+## Korelacje dla ATS cz.2 {.smaller}
+
+Je¿eli nasz model nie jest trywialny, tzn. proces $r$ nie jest deterministyczny 
+na ¿adnym odcinku czasu, to $r_{t+\Delta}, r_t, 1$ s¹ liniowo niezale¿ne, zatem
+poprzednia równoœæ zachodzi je¿eli ka¿dy ze wspó³czynników jest równy $0$.
+St¹d:
+$$n(t+\Delta,\tau_1) = a\,n(t+\Delta,\tau_2),\quad n(t,\tau_1) = a\,n(t,\tau_2)$$
+Zauwa¿my, ¿e je¿eli dla pewych $t,\tau_2\ge 0$ funkcja $n(t,\tau_2)=0$, to $n(t,\tau)=0$ dla wszystkich $\tau$. Poza tym przypadkiem, $a$ jest niezale¿ne od $\Delta$. Ustalmy $t$ takie, ¿e $n(t,\tau)\neq 0$. Z pierwszej równoœci dostajemy
+$$\frac{n(t+\Delta,\tau_1)}{n(t,\tau_1)} = \frac{n(t+\Delta,\tau_2)}{n(t,\tau_2)},$$
+a wiêc ilorazy s¹ niezale¿ne od drugiej zmiennej $\tau$ i zale¿¹ jedynie od $\Delta$  (oczywiœcie poza przypadkiem, gdy funkcja $n$ siê zeruje). Oznacza to, ¿e istniej¹ funkcje g³adkie $h, f$, ¿e dla ka¿dego $\tau, \Delta \ge0$ mamy:
+$$ n(\Delta, \tau) = h(\Delta)\cdot f(\tau), \quad \forall\,\Delta\ge t,\ \tau\ge0$$
+
+## Korelacje dla ATS cz.3 {.smaller}
+
+Z g³adkoœci $n$ oraz argumentu gêstoœciowego wynika, ¿e funkcja $n$ jest postaci:
+$$ n(t, \tau) = \tilde{h}(t)\cdot \tilde{f}(\tau), \quad \forall\, t, \tau\ge0$$
+dla pewnych funkcji $f,h$.
